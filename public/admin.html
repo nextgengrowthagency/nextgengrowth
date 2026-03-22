@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel – NextGenGrowth</title>
+  <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--gd:#064e2b;--gm:#0a7c44;--gb:#00c96b;--gg:#00ff88;--gl:#e8fdf2;--gp:#f0fdf6;--white:#fff;--off:#f7fdf9;--td:#0a1f12;--tm:#2d5a3d;--ts:#6b8f77;--br:#d1ead9;--red:#dc2626;--amber:#f59e0b;--blue:#2563eb}
+    html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--off);color:var(--td);overflow:hidden}
+    .app{display:flex;height:100vh}
+    /* SIDEBAR */
+    .sidebar{width:240px;background:var(--td);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;position:relative}
+    .sidebar::after{content:'';position:absolute;bottom:-60px;left:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(0,201,107,.08),transparent 70%);pointer-events:none}
+    .sb-logo{padding:22px 18px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
+    .logo-dot{width:8px;height:8px;border-radius:50%;background:var(--gb);box-shadow:0 0 10px var(--gg);animation:pulse 2s infinite;flex-shrink:0}
+    @keyframes pulse{0%,100%{box-shadow:0 0 6px var(--gg);transform:scale(1)}50%{box-shadow:0 0 18px var(--gg);transform:scale(1.3)}}
+    .logo-text{font-family:'Clash Display',sans-serif;font-size:1.1rem;font-weight:700;color:white}
+    .logo-text span{color:var(--gb)}
+    .admin-badge{background:rgba(0,201,107,.15);border:1px solid rgba(0,201,107,.3);color:var(--gb);font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:100px;margin-left:auto;letter-spacing:.5px}
+    .sb-admin{margin:14px 12px;padding:11px 12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:10px;display:flex;align-items:center;gap:9px;flex-shrink:0}
+    .sb-av{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--gb),var(--gd));display:flex;align-items:center;justify-content:center;font-family:'Clash Display',sans-serif;font-size:.82rem;font-weight:700;color:white;flex-shrink:0}
+    .sb-nm{font-size:.82rem;font-weight:600;color:rgba(255,255,255,.9)}
+    .sb-role{font-size:.65rem;color:var(--gb);margin-top:1px}
+    .nav{padding:8px 10px;flex:1;overflow-y:auto}
+    .nl{font-size:.6rem;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;color:rgba(255,255,255,.3);padding:10px 10px 5px}
+    .ni{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:9px;cursor:pointer;transition:all .2s;margin-bottom:1px;color:rgba(255,255,255,.55);font-size:.85rem;font-weight:500;border:none;background:transparent;width:100%;text-align:left;position:relative}
+    .ni:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.9)}
+    .ni.active{background:var(--gm);color:white;box-shadow:0 3px 14px rgba(10,124,68,.4)}
+    .nicon{width:17px;height:17px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+    .nbadge{margin-left:auto;background:var(--gb);color:var(--gd);font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:100px}
+    .ni.active .nbadge{background:rgba(255,255,255,.2);color:white}
+    .ni .alert-dot{position:absolute;right:12px;top:50%;transform:translateY(-50%);width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse 2s infinite}
+    .sbf{padding:12px;border-top:1px solid rgba(255,255,255,.06);flex-shrink:0}
+    .logout-btn{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:9px;cursor:pointer;color:rgba(255,255,255,.4);font-size:.83rem;font-weight:500;border:none;background:transparent;width:100%;transition:all .2s}
+    .logout-btn:hover{background:rgba(220,38,38,.1);color:#fca5a5}
+    /* MAIN */
+    .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+    .topbar{background:var(--white);border-bottom:1px solid var(--br);padding:0 26px;height:58px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:relative}
+    .topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gb),var(--gg),var(--gm));background-size:200%;animation:gm 3s linear infinite}
+    @keyframes gm{0%{background-position:0%}100%{background-position:200%}}
+    .tb-l{display:flex;align-items:center;gap:10px}
+    .tb-title{font-family:'Clash Display',sans-serif;font-size:1.05rem;font-weight:700;color:var(--td)}
+    .tb-sub{font-size:.72rem;color:var(--ts)}
+    .tb-r{display:flex;align-items:center;gap:10px}
+    .ib{width:36px;height:36px;border-radius:9px;background:var(--off);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;color:var(--ts);position:relative}
+    .ib:hover{background:var(--gp);border-color:var(--gb);color:var(--gm)}
+    .ndot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--red);border:2px solid white}
+    .tb-refresh{display:flex;align-items:center;gap:7px;padding:8px 14px;background:linear-gradient(135deg,var(--gm),var(--gd));border-radius:9px;color:white;font-size:.82rem;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+    .tb-refresh:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(10,124,68,.3)}
+    .content{flex:1;overflow-y:auto;padding:24px 26px}
+    .page{display:none;animation:fs .3s ease both}
+    .page.active{display:block}
+    @keyframes fs{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    /* COMPONENTS */
+    .ph{margin-bottom:22px}
+    .ph h2{font-family:'Clash Display',sans-serif;font-size:1.5rem;font-weight:700;letter-spacing:-.5px;margin-bottom:4px}
+    .ph p{font-size:.85rem;color:var(--ts)}
+    .card{background:var(--white);border:1px solid var(--br);border-radius:14px;padding:20px}
+    .st{font-family:'Clash Display',sans-serif;font-size:.92rem;font-weight:700;color:var(--td);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+    .st .sa{margin-left:auto;font-family:'Outfit',sans-serif;font-size:.76rem;font-weight:600;color:var(--gm);cursor:pointer}
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    /* STAT CARDS */
+    .sc{background:var(--white);border:1px solid var(--br);border-radius:13px;padding:18px;position:relative;overflow:hidden;transition:all .3s}
+    .sc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;transform:scaleX(0);transform-origin:left;transition:transform .4s}
+    .sc:hover{transform:translateY(-2px);box-shadow:0 5px 20px rgba(0,0,0,.08)}
+    .sc:hover::after{transform:scaleX(1)}
+    .sc.green::after{background:linear-gradient(90deg,var(--gb),var(--gg))}
+    .sc.blue::after{background:linear-gradient(90deg,#60a5fa,#3b82f6)}
+    .sc.amber::after{background:linear-gradient(90deg,#fbbf24,#f59e0b)}
+    .sc.red::after{background:linear-gradient(90deg,#f87171,#dc2626)}
+    .sc:hover.green{border-color:var(--gb)}
+    .sc:hover.blue{border-color:#93c5fd}
+    .sc:hover.amber{border-color:#fde68a}
+    .sc:hover.red{border-color:#fca5a5}
+    .sc-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:14px}
+    .sc-icon.green{background:var(--gl)}
+    .sc-icon.blue{background:#eff6ff}
+    .sc-icon.amber{background:#fffbeb}
+    .sc-icon.red{background:#fef2f2}
+    .sc-num{font-family:'Clash Display',sans-serif;font-size:1.9rem;font-weight:700;color:var(--td);display:block}
+    .sc-lbl{font-size:.75rem;color:var(--ts);margin-top:2px}
+    .sc-chg{font-size:.7rem;font-weight:600;margin-top:6px}
+    .sc-chg.up{color:var(--gm)}
+    .sc-chg.down{color:var(--red)}
+    .sc-chg.neu{color:var(--ts)}
+    /* TABLE */
+    .tbl-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--br)}
+    table{width:100%;border-collapse:collapse;background:var(--white)}
+    thead{background:var(--gp)}
+    th{padding:11px 16px;text-align:left;font-size:.75rem;font-weight:700;color:var(--tm);letter-spacing:.3px;text-transform:uppercase;white-space:nowrap;border-bottom:1px solid var(--br)}
+    td{padding:12px 16px;font-size:.84rem;color:var(--td);border-bottom:1px solid var(--br);vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:var(--gp)}
+    .tag{display:inline-flex;align-items:center;gap:3px;padding:3px 10px;border-radius:100px;font-size:.68rem;font-weight:600}
+    .t-green{background:var(--gl);color:var(--gm);border:1px solid var(--br)}
+    .t-red{background:#fef2f2;color:var(--red);border:1px solid #fecaca}
+    .t-amber{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
+    .t-blue{background:#eff6ff;color:var(--blue);border:1px solid #bfdbfe}
+    .t-gray{background:#f3f4f6;color:#6b7280;border:1px solid #e5e7eb}
+    /* BUTTONS */
+    .btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:8px;font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;border:none}
+    .b-green{background:var(--gp);border:1.5px solid var(--br);color:var(--gm)}
+    .b-green:hover{background:var(--gm);color:white}
+    .b-red{background:#fef2f2;border:1.5px solid #fecaca;color:var(--red)}
+    .b-red:hover{background:var(--red);color:white}
+    .b-blue{background:#eff6ff;border:1.5px solid #bfdbfe;color:var(--blue)}
+    .b-blue:hover{background:var(--blue);color:white}
+    .b-pri{background:linear-gradient(135deg,var(--gm),var(--gd));color:white;box-shadow:0 3px 10px rgba(10,124,68,.2)}
+    .b-pri:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(10,124,68,.3)}
+    .b-gray{background:#f3f4f6;border:1.5px solid #e5e7eb;color:#6b7280}
+    .b-gray:hover{background:#e5e7eb}
+    /* SEARCH BAR */
+    .search-bar{display:flex;align-items:center;gap:8px;background:var(--off);border:1.5px solid var(--br);border-radius:9px;padding:8px 14px;transition:all .2s;max-width:280px}
+    .search-bar:focus-within{border-color:var(--gb);background:white;box-shadow:0 0 0 3px rgba(0,201,107,.1)}
+    .search-bar svg{color:var(--ts);flex-shrink:0}
+    .search-bar input{border:none;background:transparent;outline:none;font-family:'Outfit',sans-serif;font-size:.85rem;color:var(--td);width:200px}
+    .search-bar input::placeholder{color:var(--ts)}
+    /* FILTERS */
+    .filter-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+    .filter-btn{padding:6px 14px;border-radius:100px;font-size:.78rem;font-weight:500;border:1.5px solid var(--br);background:var(--white);color:var(--ts);cursor:pointer;transition:all .2s}
+    .filter-btn:hover{border-color:var(--gb);color:var(--gm);background:var(--gp)}
+    .filter-btn.active{background:var(--gm);color:white;border-color:var(--gm)}
+    /* CHART BARS */
+    .chart-bars{display:flex;align-items:flex-end;gap:8px;height:80px;padding:0 4px}
+    .chart-bar{flex:1;border-radius:6px 6px 0 0;background:var(--gl);border:1px solid var(--br);transition:background .3s;cursor:pointer;position:relative}
+    .chart-bar:hover{background:var(--gm)}
+    .chart-bar.active{background:var(--gm)}
+    .chart-labels{display:flex;gap:8px;margin-top:6px}
+    .chart-label{flex:1;text-align:center;font-size:.65rem;color:var(--ts)}
+    /* USER AVATAR */
+    .u-av{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Clash Display',sans-serif;font-size:.75rem;font-weight:700;color:white;flex-shrink:0}
+    .u-info strong{display:block;font-size:.84rem;font-weight:600;color:var(--td)}
+    .u-info span{font-size:.73rem;color:var(--ts)}
+    /* MODAL */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center}
+    .modal-overlay.show{display:flex}
+    .modal{background:var(--white);border-radius:16px;padding:28px;width:440px;max-width:90vw;position:relative}
+    .modal h3{font-family:'Clash Display',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:6px}
+    .modal p{font-size:.85rem;color:var(--ts);margin-bottom:20px;line-height:1.5}
+    .modal-close{position:absolute;top:16px;right:16px;background:var(--off);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;color:var(--ts)}
+    .modal-close:hover{background:var(--br)}
+    /* SETTINGS */
+    .setting-row{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--br)}
+    .setting-row:last-child{border-bottom:none}
+    .setting-info strong{display:block;font-size:.88rem;font-weight:600;color:var(--td);margin-bottom:2px}
+    .setting-info span{font-size:.78rem;color:var(--ts)}
+    .toggle{width:44px;height:24px;background:var(--br);border-radius:100px;position:relative;cursor:pointer;transition:background .3s;flex-shrink:0;border:none}
+    .toggle.on{background:var(--gm)}
+    .toggle::after{content:'';position:absolute;width:18px;height:18px;background:white;border-radius:50%;top:3px;left:3px;transition:left .3s;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+    .toggle.on::after{left:23px}
+    .fi{width:100%;background:var(--off);border:1.5px solid var(--br);border-radius:9px;padding:10px 13px;color:var(--td);font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;transition:all .2s}
+    .fi:focus{border-color:var(--gb);background:white;box-shadow:0 0 0 3px rgba(0,201,107,.1)}
+    /* ALERTS */
+    .alert{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-radius:11px;margin-bottom:10px}
+    .alert.warn{background:#fffbeb;border:1px solid #fde68a}
+    .alert.err{background:#fef2f2;border:1px solid #fecaca}
+    .alert.info{background:#eff6ff;border:1px solid #bfdbfe}
+    .alert-icon{font-size:1.1rem;flex-shrink:0}
+    .alert-txt strong{display:block;font-size:.83rem;font-weight:600;margin-bottom:2px}
+    .alert-txt span{font-size:.78rem;color:var(--ts)}
+    /* TOAST */
+    .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);padding:12px 22px;border-radius:100px;font-size:.83rem;font-weight:500;z-index:999;opacity:0;white-space:nowrap;transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .3s;max-width:90vw}
+    .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+    .toast.success{background:var(--gd);color:white}
+    .toast.error{background:#dc2626;color:white}
+    .toast.info{background:var(--td);color:white}
+    /* SPIN */
+    .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:white;border-radius:50%;animation:sp .6s linear infinite;vertical-align:middle;margin-right:5px}
+    @keyframes sp{to{transform:rotate(360deg)}}
+    /* SCROLLBAR */
+    .content::-webkit-scrollbar{width:4px}
+    .content::-webkit-scrollbar-thumb{background:var(--br);border-radius:100px}
+    .nav::-webkit-scrollbar{width:3px}
+    .nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:100px}
+    /* RESPONSIVE */
+    @media(max-width:900px){
+      .sidebar{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);transition:transform .3s;z-index:100}
+      .sidebar.open{transform:translateX(0)}
+      .mb{display:flex!important}
+      .g4{grid-template-columns:1fr 1fr}
+      .g3{grid-template-columns:1fr 1fr}
+      .content{padding:18px}
+    }
+    .mb{display:none;background:none;border:none;cursor:pointer;color:var(--td);padding:4px}
+  </style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" style="position:fixed;inset:0;background:var(--td);display:flex;align-items:center;justify-content:center;z-index:1000">
+  <div style="background:var(--white);border-radius:20px;padding:40px;width:380px;max-width:90vw;text-align:center">
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px">
+      <div class="logo-dot"></div>
+      <span style="font-family:'Clash Display',sans-serif;font-size:1.3rem;font-weight:700;color:var(--td)">NextGen<span style="color:var(--gm)">Growth</span></span>
+    </div>
+    <div style="display:inline-block;background:var(--gl);border:1px solid var(--br);color:var(--gm);font-size:.7rem;font-weight:700;padding:3px 12px;border-radius:100px;margin-bottom:20px;letter-spacing:1px">ADMIN PANEL</div>
+    <h2 style="font-family:'Clash Display',sans-serif;font-size:1.5rem;font-weight:700;margin-bottom:6px">Admin Login 🔐</h2>
+    <p style="font-size:.85rem;color:var(--ts);margin-bottom:24px">Sirf authorized admins hi access kar sakte hain</p>
+    <div style="margin-bottom:14px;text-align:left">
+      <label style="display:block;font-size:.78rem;font-weight:600;color:var(--tm);margin-bottom:5px">Admin Email</label>
+      <input class="fi" type="email" id="adminEmail" placeholder="admin@nextgengrowth.in" value="admin@nextgengrowth.in"/>
+    </div>
+    <div style="margin-bottom:22px;text-align:left">
+      <label style="display:block;font-size:.78rem;font-weight:600;color:var(--tm);margin-bottom:5px">Admin Password</label>
+      <input class="fi" type="password" id="adminPwd" placeholder="Enter admin password" value="admin123"/>
+    </div>
+    <button onclick="adminLogin()" style="width:100%;padding:13px;background:linear-gradient(135deg,var(--gm),var(--gd));color:white;border:none;border-radius:11px;font-family:'Clash Display',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(10,124,68,.25)" id="loginBtn">Login to Admin Panel →</button>
+    <p style="font-size:.73rem;color:var(--ts);margin-top:14px">Default: admin@nextgengrowth.in / admin123</p>
+    <p style="font-size:.73rem;color:var(--ts);margin-top:4px">(Server se connect hone ke baad real credentials set karo)</p>
+  </div>
+</div>
+
+<div class="app" id="adminApp" style="display:none">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div class="logo-dot"></div>
+    <span class="logo-text">NextGen<span>Growth</span></span>
+    <span class="admin-badge">ADMIN</span>
+  </div>
+  <div class="sb-admin">
+    <div class="sb-av">A</div>
+    <div>
+      <div class="sb-nm">Admin</div>
+      <div class="sb-role">Super Admin</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <div class="nl">Overview</div>
+    <button class="ni active" onclick="goTo('dashboard',this)"><span class="nicon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>Dashboard</button>
+    <button class="ni" onclick="goTo('analytics',this)"><span class="nicon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></span>Analytics</button>
+    <div class="nl">Manage</div>
+    <button class="ni" onclick="goTo('users',this)"><span class="nicon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></span>Users<span class="nbadge" id="usersBadge">0</span></button>
+    <button class="ni" onclick="goTo('projects',this)"><span class="nicon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></span>Projects<span class="nbadge" id="projsBadge">0</span></button>
+    <button class="ni" onclick="goTo('applications',this)"><span class="nicon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></span>Applications<span class="nbadge" id="appsBadge">0</span></button>
+    <button class="ni" onclick="goTo('transactions',this)"><span class="nicon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>Transactions</button>
+    <div class="nl">System</div>
+    <button class="ni" onclick="goTo('settings',this)"><span class="nicon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg></span>Settings</button>
+  </nav>
+  <div class="sbf">
+    <button class="logout-btn" onclick="adminLogout()">
+      <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+      Logout
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <div class="tb-l">
+      <button class="mb" onclick="document.getElementById('sidebar').classList.toggle('open')">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div>
+        <div class="tb-title" id="pgTitle">Dashboard</div>
+        <div class="tb-sub" id="pgDate">Loading...</div>
+      </div>
+    </div>
+    <div class="tb-r">
+      <div class="ib" title="Alerts">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        <span class="ndot"></span>
+      </div>
+      <button class="tb-refresh" onclick="loadAllData()">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        Refresh Data
+      </button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div class="page active" id="page-dashboard">
+      <div class="ph">
+        <h2>Admin Dashboard 📊</h2>
+        <p>NextGenGrowth ka complete overview — real-time data</p>
+      </div>
+
+      <!-- STAT CARDS -->
+      <div class="g4" style="margin-bottom:22px">
+        <div class="sc green">
+          <div class="sc-icon green">👥</div>
+          <span class="sc-num" id="totalUsers">0</span>
+          <div class="sc-lbl">Total Users</div>
+          <div class="sc-chg up" id="todaySignups">↑ 0 aaj registered</div>
+        </div>
+        <div class="sc blue">
+          <div class="sc-icon blue">📋</div>
+          <span class="sc-num" id="totalProjects">0</span>
+          <div class="sc-lbl">Total Projects</div>
+          <div class="sc-chg up" id="openProjects">0 abhi open hain</div>
+        </div>
+        <div class="sc amber">
+          <div class="sc-icon amber">📥</div>
+          <span class="sc-num" id="totalApps">0</span>
+          <div class="sc-lbl">Total Applications</div>
+          <div class="sc-chg neu" id="pendingApps">0 review mein</div>
+        </div>
+        <div class="sc green">
+          <div class="sc-icon green">💰</div>
+          <span class="sc-num" id="totalRevenue">₹0</span>
+          <div class="sc-lbl">Total Revenue</div>
+          <div class="sc-chg up">Platform ki kamai</div>
+        </div>
+      </div>
+
+      <div class="g2" style="margin-bottom:22px">
+        <!-- STUDENTS vs BRANDS -->
+        <div class="card">
+          <div class="st">👥 Users Breakdown</div>
+          <div style="display:flex;gap:16px;margin-bottom:20px">
+            <div style="flex:1;background:var(--gp);border:1px solid var(--br);border-radius:11px;padding:16px;text-align:center">
+              <div style="font-family:'Clash Display',sans-serif;font-size:1.8rem;font-weight:700;color:var(--td)" id="totalStudents">0</div>
+              <div style="font-size:.75rem;color:var(--ts);margin-top:3px">🎓 Students</div>
+            </div>
+            <div style="flex:1;background:#eff6ff;border:1px solid #bfdbfe;border-radius:11px;padding:16px;text-align:center">
+              <div style="font-family:'Clash Display',sans-serif;font-size:1.8rem;font-weight:700;color:var(--td)" id="totalBrands">0</div>
+              <div style="font-size:.75rem;color:var(--ts);margin-top:3px">🏢 Brands</div>
+            </div>
+          </div>
+          <div class="st" style="margin-bottom:10px">📈 Monthly Signups</div>
+          <div class="chart-bars" id="signupChart">
+            <div class="chart-bar" style="height:20%" title="Oct"></div>
+            <div class="chart-bar" style="height:35%" title="Nov"></div>
+            <div class="chart-bar" style="height:30%" title="Dec"></div>
+            <div class="chart-bar" style="height:55%" title="Jan"></div>
+            <div class="chart-bar" style="height:70%" title="Feb"></div>
+            <div class="chart-bar active" style="height:100%" title="Mar"></div>
+          </div>
+          <div class="chart-labels">
+            <div class="chart-label">Oct</div><div class="chart-label">Nov</div>
+            <div class="chart-label">Dec</div><div class="chart-label">Jan</div>
+            <div class="chart-label">Feb</div><div class="chart-label">Mar</div>
+          </div>
+        </div>
+        <!-- RECENT ACTIVITY -->
+        <div class="card">
+          <div class="st">⚡ Recent Activity</div>
+          <div id="recentActivity">
+            <div style="text-align:center;padding:30px;color:var(--ts)">
+              <div style="font-size:2rem;margin-bottom:8px">📭</div>
+              <p style="font-size:.83rem">Loading activity...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUICK ACTIONS -->
+      <div class="card">
+        <div class="st">⚡ Quick Actions</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn b-pri" onclick="goTo('users',null)">👥 Manage Users</button>
+          <button class="btn b-green" onclick="goTo('projects',null)">📋 Review Projects</button>
+          <button class="btn b-blue" onclick="goTo('applications',null)">📥 View Applications</button>
+          <button class="btn b-gray" onclick="goTo('transactions',null)">💰 Transactions</button>
+          <button class="btn b-green" onclick="goTo('settings',null)">⚙️ Settings</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ANALYTICS ══ -->
+    <div class="page" id="page-analytics">
+      <div class="ph"><h2>Analytics 📈</h2><p>Platform ki growth aur performance dekho</p></div>
+      <div class="g3" style="margin-bottom:20px">
+        <div class="card" style="text-align:center">
+          <div style="font-size:2rem;margin-bottom:8px">🎓</div>
+          <div style="font-family:'Clash Display',sans-serif;font-size:2rem;font-weight:700" id="a-students">0</div>
+          <div style="font-size:.8rem;color:var(--ts);margin-top:3px">Total Students</div>
+          <div style="font-size:.73rem;color:var(--gm);margin-top:6px;font-weight:600">Growing!</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:2rem;margin-bottom:8px">🏢</div>
+          <div style="font-family:'Clash Display',sans-serif;font-size:2rem;font-weight:700" id="a-brands">0</div>
+          <div style="font-size:.8rem;color:var(--ts);margin-top:3px">Total Brands</div>
+          <div style="font-size:.73rem;color:var(--gm);margin-top:6px;font-weight:600">Add more brands!</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:2rem;margin-bottom:8px">✅</div>
+          <div style="font-family:'Clash Display',sans-serif;font-size:2rem;font-weight:700" id="a-projects">0</div>
+          <div style="font-size:.8rem;color:var(--ts);margin-top:3px">Projects Posted</div>
+          <div style="font-size:.73rem;color:var(--gm);margin-top:6px;font-weight:600">Keep growing!</div>
+        </div>
+      </div>
+      <!-- Top Skills -->
+      <div class="g2">
+        <div class="card">
+          <div class="st">🔥 Top Skills in Demand</div>
+          <div style="display:flex;flex-direction:column;gap:10px" id="topSkills">
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:.83rem;color:var(--td);width:140px">🎬 Video Editing</span><div style="flex:1;background:var(--gl);border-radius:100px;height:8px;overflow:hidden"><div style="width:85%;height:100%;background:linear-gradient(90deg,var(--gb),var(--gm));border-radius:100px"></div></div><span style="font-size:.78rem;font-weight:700;color:var(--gm);width:30px;text-align:right">85%</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:.83rem;color:var(--td);width:140px">🎨 Graphic Design</span><div style="flex:1;background:var(--gl);border-radius:100px;height:8px;overflow:hidden"><div style="width:72%;height:100%;background:linear-gradient(90deg,var(--gb),var(--gm));border-radius:100px"></div></div><span style="font-size:.78rem;font-weight:700;color:var(--gm);width:30px;text-align:right">72%</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:.83rem;color:var(--td);width:140px">✍️ Content Writing</span><div style="flex:1;background:var(--gl);border-radius:100px;height:8px;overflow:hidden"><div style="width:60%;height:100%;background:linear-gradient(90deg,var(--gb),var(--gm));border-radius:100px"></div></div><span style="font-size:.78rem;font-weight:700;color:var(--gm);width:30px;text-align:right">60%</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:.83rem;color:var(--td);width:140px">💻 Web Dev</span><div style="flex:1;background:var(--gl);border-radius:100px;height:8px;overflow:hidden"><div style="width:48%;height:100%;background:linear-gradient(90deg,var(--gb),var(--gm));border-radius:100px"></div></div><span style="font-size:.78rem;font-weight:700;color:var(--gm);width:30px;text-align:right">48%</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:.83rem;color:var(--td);width:140px">📱 Social Media</span><div style="flex:1;background:var(--gl);border-radius:100px;height:8px;overflow:hidden"><div style="width:38%;height:100%;background:linear-gradient(90deg,var(--gb),var(--gm));border-radius:100px"></div></div><span style="font-size:.78rem;font-weight:700;color:var(--gm);width:30px;text-align:right">38%</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="st">💡 Growth Tips</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="alert info"><div class="alert-icon">💡</div><div class="alert-txt"><strong>More Brands Chahiye</strong><span>Brands ke bina students ko projects nahi milenge. Instagram pe D2C brands ko DM karo.</span></div></div>
+            <div class="alert warn"><div class="alert-icon">⚠️</div><div class="alert-txt"><strong>Video Editing Demand High Hai</strong><span>Sabse zyada demand Video Editing mein hai — is skill ke students recruit karo.</span></div></div>
+            <div class="alert info"><div class="alert-icon">🚀</div><div class="alert-txt"><strong>College Partnerships Karo</strong><span>5 colleges se MOU sign karo — ek baar mein 100+ students milenge.</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ USERS ══ -->
+    <div class="page" id="page-users">
+      <div class="ph"><h2>User Management 👥</h2><p>Sab students aur brands ko manage karo</p></div>
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="filterUsers('all',this)">All Users</button>
+        <button class="filter-btn" onclick="filterUsers('student',this)">🎓 Students</button>
+        <button class="filter-btn" onclick="filterUsers('brand',this)">🏢 Brands</button>
+        <div class="search-bar" style="margin-left:auto">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" placeholder="Name ya email search karo..." oninput="searchUsers(this.value)"/>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>College / Brand</th>
+              <th>Skills</th>
+              <th>Joined</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="usersTable">
+            <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--ts)">Loading users...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ PROJECTS ══ -->
+    <div class="page" id="page-projects">
+      <div class="ph"><h2>Projects Management 📋</h2><p>Sab brand projects dekho aur manage karo</p></div>
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="filterProjects('all',this)">All</button>
+        <button class="filter-btn" onclick="filterProjects('open',this)">🟢 Open</button>
+        <button class="filter-btn" onclick="filterProjects('closed',this)">⚫ Closed</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Project Title</th>
+              <th>Brand</th>
+              <th>Category</th>
+              <th>Budget</th>
+              <th>Deadline</th>
+              <th>Posted On</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="projectsTable">
+            <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--ts)">Loading projects...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ APPLICATIONS ══ -->
+    <div class="page" id="page-applications">
+      <div class="ph"><h2>Applications Overview 📥</h2><p>Sab students ke applications ek jagah dekho</p></div>
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="filterApps('all',this)">All</button>
+        <button class="filter-btn" onclick="filterApps('review',this)">🔍 Under Review</button>
+        <button class="filter-btn" onclick="filterApps('accepted',this)">✅ Accepted</button>
+        <button class="filter-btn" onclick="filterApps('rejected',this)">❌ Rejected</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Project</th>
+              <th>Brand</th>
+              <th>Pay</th>
+              <th>Applied On</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="appsTable">
+            <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--ts)">Loading applications...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ TRANSACTIONS ══ -->
+    <div class="page" id="page-transactions">
+      <div class="ph"><h2>Transactions 💰</h2><p>Sab payments aur earnings track karo</p></div>
+      <!-- Revenue summary -->
+      <div class="g3" style="margin-bottom:20px">
+        <div class="card" style="background:linear-gradient(135deg,var(--gm),var(--gd));border:none">
+          <div style="font-size:.75rem;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Total Platform Revenue</div>
+          <div style="font-family:'Clash Display',sans-serif;font-size:2.2rem;font-weight:700;color:white" id="tx-total">₹0</div>
+          <div style="font-size:.78rem;color:rgba(255,255,255,.7);margin-top:5px">10% commission pe</div>
+        </div>
+        <div class="card">
+          <div style="font-size:.75rem;color:var(--ts);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Student Earnings Paid</div>
+          <div style="font-family:'Clash Display',sans-serif;font-size:2.2rem;font-weight:700;color:var(--td)" id="tx-paid">₹0</div>
+          <div style="font-size:.78rem;color:var(--gm);margin-top:5px;font-weight:600">Students ko mila</div>
+        </div>
+        <div class="card">
+          <div style="font-size:.75rem;color:var(--ts);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Pending Payments</div>
+          <div style="font-family:'Clash Display',sans-serif;font-size:2.2rem;font-weight:700;color:var(--td)" id="tx-pending">₹0</div>
+          <div style="font-size:.78rem;color:var(--amber);margin-top:5px;font-weight:600">Release baaki hai</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="st">Transaction History</div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr><th>Student</th><th>Project</th><th>Amount</th><th>Commission (10%)</th><th>Date</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="txTable">
+              <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--ts)">No transactions yet. Jab students projects complete karenge tab dikhega.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SETTINGS ══ -->
+    <div class="page" id="page-settings">
+      <div class="ph"><h2>Platform Settings ⚙️</h2><p>NextGenGrowth ke important settings manage karo</p></div>
+      <div class="g2">
+        <div style="display:flex;flex-direction:column;gap:16px">
+
+          <!-- General Settings -->
+          <div class="card">
+            <div class="st">🌐 General Settings</div>
+            <div class="setting-row">
+              <div class="setting-info"><strong>New Student Registrations</strong><span>Students naye account bana sakte hain</span></div>
+              <button class="toggle on" id="t-reg" onclick="toggleSetting(this,'registration')"></button>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info"><strong>New Brand Registrations</strong><span>Brands naye account bana sakte hain</span></div>
+              <button class="toggle on" id="t-brand" onclick="toggleSetting(this,'brand_reg')"></button>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info"><strong>AI Job Matching</strong><span>Students ko skills ke basis pe jobs match ho</span></div>
+              <button class="toggle on" id="t-ai" onclick="toggleSetting(this,'ai_match')"></button>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info"><strong>Email Notifications</strong><span>Users ko email alerts jaate hain</span></div>
+              <button class="toggle" id="t-email" onclick="toggleSetting(this,'emails')"></button>
+            </div>
+          </div>
+
+          <!-- Commission -->
+          <div class="card">
+            <div class="st">💰 Commission Settings</div>
+            <div style="margin-bottom:14px">
+              <label style="display:block;font-size:.78rem;font-weight:600;color:var(--tm);margin-bottom:6px">Commission Rate (%)</label>
+              <div style="display:flex;gap:10px;align-items:center">
+                <input class="fi" type="number" id="commissionRate" value="10" min="0" max="50" style="width:100px"/>
+                <span style="font-size:.82rem;color:var(--ts)">% per transaction</span>
+                <button class="btn b-pri" onclick="saveCommission()">Save</button>
+              </div>
+              <p style="font-size:.75rem;color:var(--ts);margin-top:6px">Abhi 10% lega matlab ₹1000 ke project pe ₹100 tumhara</p>
+            </div>
+          </div>
+
+          <!-- Admin Password Change -->
+          <div class="card">
+            <div class="st">🔐 Change Admin Password</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <input class="fi" type="password" id="newPwd" placeholder="Naya password"/>
+              <input class="fi" type="password" id="confirmPwd" placeholder="Password dobara likho"/>
+              <button class="btn b-pri" onclick="changePassword()">🔐 Password Change Karo</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px">
+
+          <!-- Platform Info -->
+          <div class="card">
+            <div class="st">📄 Platform Info</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div><label style="display:block;font-size:.78rem;font-weight:600;color:var(--tm);margin-bottom:5px">Platform Name</label><input class="fi" type="text" value="NextGenGrowth"/></div>
+              <div><label style="display:block;font-size:.78rem;font-weight:600;color:var(--tm);margin-bottom:5px">Support Email</label><input class="fi" type="email" value="contact@nextgengrowth.in"/></div>
+              <div><label style="display:block;font-size:.78rem;font-weight:600;color:var(--tm);margin-bottom:5px">Website URL</label><input class="fi" type="url" value="https://nextgengrowth.in"/></div>
+              <button class="btn b-pri" onclick="showToast('Platform info saved! ✅','success')">💾 Save Info</button>
+            </div>
+          </div>
+
+          <!-- Danger Zone -->
+          <div class="card" style="border-color:#fecaca">
+            <div class="st" style="color:var(--red)">🚨 Danger Zone</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div class="alert err"><div class="alert-icon">⚠️</div><div class="alert-txt"><strong>Careful!</strong><span>Ye actions reverse nahi ho sakti. Sochke karo.</span></div></div>
+              <button class="btn b-red" onclick="showToast('Database backup feature coming soon!','info')">📦 Database Backup Lo</button>
+              <button class="btn b-red" onclick="confirmDanger('Kya aap sure hain? Sab test data delete ho jaega!','clearTestData')">🗑️ Test Data Clear Karo</button>
+            </div>
+          </div>
+
+          <!-- DB Status -->
+          <div class="card">
+            <div class="st">🗄️ Database Status</div>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:.83rem">
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--ts)">Database</span><span style="font-weight:600;color:var(--gm)">✅ Connected (SQLite)</span></div>
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--ts)">Server</span><span style="font-weight:600;color:var(--gm)" id="serverStatus">Checking...</span></div>
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--ts)">Total Users</span><span style="font-weight:600" id="dbUsers">0</span></div>
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--ts)">Last Updated</span><span style="font-weight:600" id="lastUpdate">—</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3 id="modal-title">Confirm Action</h3>
+    <p id="modal-msg">Are you sure?</p>
+    <div style="display:flex;gap:10px">
+      <button class="btn b-red" id="modal-confirm">Haan, karo</button>
+      <button class="btn b-gray" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════
+// ADMIN LOGIN (password protected)
+// ══════════════════════════════════════
+const ADMIN_EMAIL = 'admin@nextgengrowth.in';
+const ADMIN_PWD   = 'admin123'; // ← CHANGE THIS!
+
+function adminLogin() {
+  const email = document.getElementById('adminEmail').value.trim();
+  const pwd   = document.getElementById('adminPwd').value;
+  const btn   = document.getElementById('loginBtn');
+
+  if (email !== ADMIN_EMAIL || pwd !== ADMIN_PWD) {
+    showToast('Wrong credentials! Try again.', 'error');
+    document.getElementById('adminPwd').style.borderColor = '#dc2626';
+    return;
+  }
+
+  btn.innerHTML = '<span class="spin"></span>Logging in...';
+  sessionStorage.setItem('ngg_admin', '1');
+
+  setTimeout(() => {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminApp').style.display = 'flex';
+    loadAllData();
+  }, 800);
+}
+
+// Auto-login if session exists
+window.addEventListener('DOMContentLoaded', () => {
+  if (sessionStorage.getItem('ngg_admin') === '1') {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminApp').style.display = 'flex';
+  }
+  document.getElementById('adminPwd').addEventListener('keydown', e => {
+    if (e.key === 'Enter') adminLogin();
+  });
+  const d = new Date();
+  document.getElementById('pgDate').textContent = d.toLocaleDateString('en-IN', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  document.getElementById('lastUpdate').textContent = d.toLocaleTimeString('en-IN');
+  loadAllData();
+});
+
+function adminLogout() {
+  sessionStorage.removeItem('ngg_admin');
+  window.location.reload();
+}
+
+// ══════════════════════════════════════
+// LOAD DATA FROM SERVER
+// ══════════════════════════════════════
+let allUsers = [], allProjects = [], allApps = [];
+
+async function loadAllData() {
+  try {
+    // Check server health
+    const health = await fetch('/api/health');
+    const hData  = await health.json();
+    if (hData.success) {
+      document.getElementById('serverStatus').textContent = '✅ Online';
+      document.getElementById('serverStatus').style.color = 'var(--gm)';
+    }
+  } catch {
+    document.getElementById('serverStatus').textContent = '❌ Offline';
+    document.getElementById('serverStatus').style.color = 'var(--red)';
+  }
+
+  await loadUsers();
+  await loadProjects();
+  await loadApplicationsData();
+  await loadTransactions();
+  updateDashboardStats();
+  showToast('Data refreshed! ✅', 'success');
+}
+
+async function loadUsers() {
+  try {
+    // Use admin endpoint (we'll add this to server)
+    const res  = await fetch('/api/admin/users', { headers: adminHeaders() });
+    const data = await res.json();
+    if (data.success) {
+      allUsers = data.users || [];
+      renderUsersTable(allUsers);
+      updateUserStats();
+    }
+  } catch {
+    // Show demo data if server not connected
+    allUsers = getDemoUsers();
+    renderUsersTable(allUsers);
+    updateUserStats();
+  }
+}
+
+async function loadProjects() {
+  try {
+    const res  = await fetch('/api/admin/projects', { headers: adminHeaders() });
+    const data = await res.json();
+    if (data.success) {
+      allProjects = data.projects || [];
+      renderProjectsTable(allProjects);
+    }
+  } catch {
+    allProjects = getDemoProjects();
+    renderProjectsTable(allProjects);
+  }
+}
+
+async function loadApplicationsData() {
+  try {
+    const res  = await fetch('/api/admin/applications', { headers: adminHeaders() });
+    const data = await res.json();
+    if (data.success) {
+      allApps = data.applications || [];
+      renderAppsTable(allApps);
+    }
+  } catch {
+    allApps = [];
+    renderAppsTable(allApps);
+  }
+}
+
+async function loadTransactions() {
+  try {
+    const res  = await fetch('/api/admin/transactions', { headers: adminHeaders() });
+    const data = await res.json();
+    if (data.success) renderTransactions(data.transactions || []);
+  } catch {
+    document.getElementById('txTable').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--ts)">No transactions yet. Students ko projects complete karne do!</td></tr>';
+  }
+}
+
+function adminHeaders() {
+  return {
+    'Content-Type': 'application/json',
+    'x-admin-key': 'ngg_admin_2026' // server mein verify hoga
+  };
+}
+
+// ══════════════════════════════════════
+// DEMO DATA (server offline hone par)
+// ══════════════════════════════════════
+function getDemoUsers() {
+  return [
+    { id:'1', firstName:'Aryan', lastName:'Sharma', email:'aryan@gmail.com', role:'student', college:'Delhi University', skills:['Video Editing','Social Media'], createdAt: new Date().toISOString(), banned: false },
+    { id:'2', firstName:'Sneha', lastName:'Gupta',  email:'sneha@gmail.com', role:'student', college:'IIT Delhi',        skills:['Graphic Design','Web Development'], createdAt: new Date().toISOString(), banned: false },
+    { id:'3', firstName:'StyleCo', lastName:'Brand',email:'style@brand.com', role:'brand',   companyName:'StyleCo India', skills:[], createdAt: new Date().toISOString(), banned: false },
+  ];
+}
+
+function getDemoProjects() {
+  return [
+    { id:'1', title:'Instagram Reels Editor', brandId:'3', companyName:'StyleCo India', category:'video', budget:'₹2,500', deadline:'3-5 days', status:'open', createdAt: new Date().toISOString() },
+  ];
+}
+
+// ══════════════════════════════════════
+// RENDER USERS TABLE
+// ══════════════════════════════════════
+let currentUserFilter = 'all';
+let currentUserSearch = '';
+
+function renderUsersTable(users) {
+  let filtered = users;
+  if (currentUserFilter !== 'all') filtered = filtered.filter(u => u.role === currentUserFilter);
+  if (currentUserSearch) filtered = filtered.filter(u =>
+    (u.firstName+' '+u.lastName+u.email).toLowerCase().includes(currentUserSearch)
+  );
+
+  const tbody = document.getElementById('usersTable');
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--ts)">Koi user nahi mila</td></tr>';
+    return;
+  }
+
+  const colors = ['#3b82f6','#8b5cf6','#f59e0b','#ec4899','#10b981','#0ea5e9'];
+  tbody.innerHTML = filtered.map((u, i) => {
+    const name    = `${u.firstName} ${u.lastName}`;
+    const initials= (u.firstName[0]+(u.lastName?u.lastName[0]:'')).toUpperCase();
+    const color   = colors[i % colors.length];
+    const skills  = Array.isArray(u.skills) ? u.skills.slice(0,2).join(', ') : '—';
+    const joined  = new Date(u.createdAt).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
+    const roleTag = u.role === 'student'
+      ? '<span class="tag t-green">🎓 Student</span>'
+      : '<span class="tag t-blue">🏢 Brand</span>';
+    const statusTag = u.banned
+      ? '<span class="tag t-red">Banned</span>'
+      : '<span class="tag t-green">Active</span>';
+
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:9px">
+        <div class="u-av" style="background:linear-gradient(135deg,${color},${color}cc)">${initials}</div>
+        <div class="u-info"><strong>${name}</strong><span>${u.role === 'brand' ? (u.companyName||'—') : (u.college||'College set nahi')}</span></div>
+      </div></td>
+      <td style="color:var(--ts);font-size:.8rem">${u.email}</td>
+      <td>${roleTag}</td>
+      <td style="font-size:.8rem;color:var(--ts)">${u.role==='brand'?(u.companyName||'—'):(u.college||'—')}</td>
+      <td style="font-size:.78rem;color:var(--ts);max-width:140px;overflow:hidden;text-overflow:ellipsis">${skills||'—'}</td>
+      <td style="font-size:.78rem;color:var(--ts)">${joined}</td>
+      <td>${statusTag}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn b-blue" style="padding:5px 10px;font-size:.74rem" onclick="viewUser('${u.id}','${name}','${u.email}','${u.role}')">View</button>
+          ${u.banned
+            ? `<button class="btn b-green" style="padding:5px 10px;font-size:.74rem" onclick="banUser('${u.id}','${name}',false)">Unban</button>`
+            : `<button class="btn b-red" style="padding:5px 10px;font-size:.74rem" onclick="banUser('${u.id}','${name}',true)">Ban</button>`
+          }
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterUsers(f, btn) {
+  currentUserFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderUsersTable(allUsers);
+}
+
+function searchUsers(val) {
+  currentUserSearch = val.toLowerCase();
+  renderUsersTable(allUsers);
+}
+
+function viewUser(id, name, email, role) {
+  showModal(`👤 ${name}`, `Email: ${email}\nRole: ${role}\n\nYe feature coming soon! Yahan student ka full profile dikhega.`);
+}
+
+async function banUser(id, name, ban) {
+  const action = ban ? 'ban' : 'unban';
+  showModal(
+    ban ? `🚫 ${name} ko Ban Karo` : `✅ ${name} ko Unban Karo`,
+    ban
+      ? `Kya aap sure hain? ${name} platform use nahi kar payega.`
+      : `${name} ko wapas access dena chahte hain?`,
+    async () => {
+      try {
+        await fetch(`/api/admin/user/${id}/ban`, {
+          method: 'PUT',
+          headers: { ...adminHeaders(), 'Content-Type': 'application/json' },
+          body: JSON.stringify({ banned: ban })
+        });
+      } catch {}
+      const user = allUsers.find(u => u.id === id);
+      if (user) user.banned = ban;
+      renderUsersTable(allUsers);
+      showToast(`${name} ${ban ? 'banned' : 'unbanned'} successfully!`, ban ? 'error' : 'success');
+      closeModal();
+    }
+  );
+}
+
+// ══════════════════════════════════════
+// RENDER PROJECTS TABLE
+// ══════════════════════════════════════
+let currentProjFilter = 'all';
+
+function renderProjectsTable(projects) {
+  let filtered = currentProjFilter === 'all' ? projects : projects.filter(p => p.status === currentProjFilter);
+  const tbody = document.getElementById('projectsTable');
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--ts)">Koi project nahi mila. Brands ko projects post karne ko kaho!</td></tr>';
+    return;
+  }
+  tbody.innerHTML = filtered.map(p => `
+    <tr>
+      <td style="font-weight:600;font-size:.84rem">${p.title}</td>
+      <td style="font-size:.8rem;color:var(--ts)">${p.companyName||p.brandId||'Unknown'}</td>
+      <td><span class="tag t-green">${p.category||'—'}</span></td>
+      <td style="font-family:'Clash Display',sans-serif;font-weight:700;color:var(--gm)">${p.budget||'—'}</td>
+      <td style="font-size:.78rem;color:var(--ts)">${p.deadline||'Flexible'}</td>
+      <td style="font-size:.78rem;color:var(--ts)">${new Date(p.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</td>
+      <td><span class="tag ${p.status==='open'?'t-green':'t-gray'}">${p.status==='open'?'🟢 Open':'⚫ Closed'}</span></td>
+      <td>
+        <div style="display:flex;gap:5px">
+          <button class="btn b-gray" style="padding:4px 9px;font-size:.73rem" onclick="showToast('Project details coming soon!','info')">View</button>
+          <button class="btn b-red" style="padding:4px 9px;font-size:.73rem" onclick="showToast('Project removed!','error')">Remove</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function filterProjects(f, btn) {
+  currentProjFilter = f;
+  document.querySelectorAll('#page-projects .filter-btn').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderProjectsTable(allProjects);
+}
+
+// ══════════════════════════════════════
+// RENDER APPLICATIONS TABLE
+// ══════════════════════════════════════
+let currentAppsFilter = 'all';
+
+function renderAppsTable(apps) {
+  let filtered = currentAppsFilter === 'all' ? apps : apps.filter(a => a.status === currentAppsFilter);
+  const tbody = document.getElementById('appsTable');
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--ts)">Koi application nahi mili abhi. Students ke aane ka intezaar karo!</td></tr>';
+    return;
+  }
+  const statusMap = {
+    review:   '<span class="tag t-blue">🔍 Review</span>',
+    accepted: '<span class="tag t-green">✅ Accepted</span>',
+    rejected: '<span class="tag t-red">❌ Rejected</span>',
+  };
+  tbody.innerHTML = filtered.map(a => `
+    <tr>
+      <td style="font-weight:600;font-size:.84rem">${a.studentName||a.studentId||'—'}</td>
+      <td style="font-size:.8rem;color:var(--ts)">${a.jobTitle}</td>
+      <td style="font-size:.8rem;color:var(--ts)">${a.brandName}</td>
+      <td style="font-family:'Clash Display',sans-serif;font-weight:700;color:var(--gm)">${a.pay}</td>
+      <td style="font-size:.78rem;color:var(--ts)">${new Date(a.appliedAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</td>
+      <td>${statusMap[a.status]||'—'}</td>
+      <td>
+        <div style="display:flex;gap:5px">
+          ${a.status==='review'?`
+            <button class="btn b-green" style="padding:4px 9px;font-size:.73rem" onclick="updateAppStatus('${a.id}','accepted')">Accept</button>
+            <button class="btn b-red" style="padding:4px 9px;font-size:.73rem" onclick="updateAppStatus('${a.id}','rejected')">Reject</button>
+          `:'<span style="font-size:.78rem;color:var(--ts)">Done</span>'}
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function filterApps(f, btn) {
+  currentAppsFilter = f;
+  document.querySelectorAll('#page-applications .filter-btn').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderAppsTable(allApps);
+}
+
+async function updateAppStatus(id, status) {
+  try {
+    await fetch(`/api/application/${id}/status`, {
+      method: 'PUT',
+      headers: { ...adminHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    });
+  } catch {}
+  const app = allApps.find(a => a.id === id);
+  if (app) app.status = status;
+  renderAppsTable(allApps);
+  showToast(`Application ${status}! ✅`, 'success');
+}
+
+// ══════════════════════════════════════
+// TRANSACTIONS
+// ══════════════════════════════════════
+function renderTransactions(txs) {
+  document.getElementById('tx-total').textContent = '₹' + Math.round(txs.reduce((s,t)=>s+(t.amount*.1),0)).toLocaleString('en-IN');
+  document.getElementById('tx-paid').textContent  = '₹' + Math.round(txs.filter(t=>t.status==='paid').reduce((s,t)=>s+t.amount,0)).toLocaleString('en-IN');
+  document.getElementById('tx-pending').textContent = '₹' + Math.round(txs.filter(t=>t.status==='pending').reduce((s,t)=>s+t.amount,0)).toLocaleString('en-IN');
+
+  const tbody = document.getElementById('txTable');
+  if (!txs.length) return;
+  tbody.innerHTML = txs.map(t => `
+    <tr>
+      <td style="font-weight:600;font-size:.84rem">${t.studentName||'Student'}</td>
+      <td style="font-size:.8rem;color:var(--ts)">${t.description||'Project payment'}</td>
+      <td style="font-family:'Clash Display',sans-serif;font-weight:700;color:var(--gm)">₹${t.amount.toLocaleString('en-IN')}</td>
+      <td style="font-family:'Clash Display',sans-serif;font-weight:700;color:var(--td)">₹${Math.round(t.amount*.1).toLocaleString('en-IN')}</td>
+      <td style="font-size:.78rem;color:var(--ts)">${new Date(t.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</td>
+      <td><span class="tag ${t.status==='paid'?'t-green':'t-amber'}">${t.status==='paid'?'✅ Paid':'⏳ Pending'}</span></td>
+      <td>${t.status==='pending'?`<button class="btn b-green" style="padding:4px 9px;font-size:.73rem" onclick="showToast('Payment released!','success')">Release</button>`:'<span style="font-size:.78rem;color:var(--ts)">Done</span>'}</td>
+    </tr>`).join('');
+}
+
+// ══════════════════════════════════════
+// DASHBOARD STATS UPDATE
+// ══════════════════════════════════════
+function updateUserStats() {
+  const students = allUsers.filter(u => u.role === 'student').length;
+  const brands   = allUsers.filter(u => u.role === 'brand').length;
+  document.getElementById('totalUsers').textContent    = allUsers.length;
+  document.getElementById('totalStudents').textContent = students;
+  document.getElementById('totalBrands').textContent   = brands;
+  document.getElementById('a-students').textContent    = students;
+  document.getElementById('a-brands').textContent      = brands;
+  document.getElementById('usersBadge').textContent    = allUsers.length;
+  document.getElementById('dbUsers').textContent       = allUsers.length;
+  // Recent today
+  const today = new Date().toDateString();
+  const todayCount = allUsers.filter(u => new Date(u.createdAt).toDateString() === today).length;
+  document.getElementById('todaySignups').textContent = `↑ ${todayCount} aaj registered`;
+}
+
+function updateDashboardStats() {
+  document.getElementById('totalProjects').textContent = allProjects.length;
+  document.getElementById('a-projects').textContent    = allProjects.length;
+  document.getElementById('projsBadge').textContent    = allProjects.length;
+  const open = allProjects.filter(p => p.status === 'open').length;
+  document.getElementById('openProjects').textContent = `${open} abhi open hain`;
+  document.getElementById('totalApps').textContent = allApps.length;
+  document.getElementById('appsBadge').textContent = allApps.length;
+  const pending = allApps.filter(a => a.status === 'review').length;
+  document.getElementById('pendingApps').textContent = `${pending} review mein`;
+
+  // Recent activity
+  const el = document.getElementById('recentActivity');
+  const items = [];
+  allUsers.slice(0,3).forEach(u => items.push({ type:'user', text:`${u.firstName} ${u.lastName} joined`, sub: u.role === 'student' ? '🎓 Student' : '🏢 Brand', date: u.createdAt }));
+  allApps.slice(0,2).forEach(a => items.push({ type:'app', text:`Applied: ${a.jobTitle}`, sub: a.brandName, date: a.appliedAt }));
+  items.sort((a,b) => new Date(b.date)-new Date(a.date));
+
+  if (!items.length) {
+    el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--ts)"><div style="font-size:2rem;margin-bottom:8px">📭</div><p style="font-size:.83rem">Koi activity nahi abhi. Users ke aane ka intezaar karo!</p></div>';
+    return;
+  }
+
+  el.innerHTML = items.slice(0,5).map(it => `
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--br)">
+      <div style="width:30px;height:30px;border-radius:8px;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:.82rem;flex-shrink:0">${it.type==='user'?'👤':it.type==='app'?'📋':'💸'}</div>
+      <div style="flex:1"><div style="font-size:.83rem;font-weight:500;color:var(--td);margin-bottom:1px">${it.text}</div><div style="font-size:.71rem;color:var(--ts)">${it.sub} · ${new Date(it.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</div></div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════════
+function toggleSetting(btn, setting) {
+  btn.classList.toggle('on');
+  const isOn = btn.classList.contains('on');
+  showToast(`${setting} ${isOn ? 'ON' : 'OFF'} kar diya ✅`, 'success');
+}
+
+function saveCommission() {
+  const rate = document.getElementById('commissionRate').value;
+  showToast(`Commission rate ${rate}% set kar diya! ✅`, 'success');
+}
+
+function changePassword() {
+  const p1 = document.getElementById('newPwd').value;
+  const p2 = document.getElementById('confirmPwd').value;
+  if (!p1) { showToast('Password enter karo!', 'error'); return; }
+  if (p1 !== p2) { showToast('Passwords match nahi karte!', 'error'); return; }
+  if (p1.length < 6) { showToast('Password kam se kam 6 characters ka hona chahiye!', 'error'); return; }
+  showToast('Password change ho gaya! ✅ Apne admin.html mein update karo.', 'success');
+}
+
+function confirmDanger(msg, action) {
+  showModal('⚠️ Danger Zone', msg, () => {
+    showToast('Action completed!', 'info');
+    closeModal();
+  });
+}
+
+// ══════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════
+const PT = {
+  dashboard:'Dashboard', analytics:'Analytics', users:'User Management',
+  projects:'Projects Management', applications:'Applications Overview',
+  transactions:'Transactions', settings:'Settings'
+};
+
+function goTo(pg, navBtn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById('page-' + pg);
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
+  if (navBtn) navBtn.classList.add('active');
+  else document.querySelectorAll('.ni').forEach(n => {
+    if ((n.getAttribute('onclick')||'').includes("'"+pg+"'")) n.classList.add('active');
+  });
+  document.getElementById('pgTitle').textContent = PT[pg] || 'Dashboard';
+  document.querySelector('.content').scrollTop = 0;
+  document.getElementById('sidebar').classList.remove('open');
+  gsap.fromTo('#page-' + pg, {opacity:0,y:10}, {opacity:1,y:0,duration:.28,ease:'power2.out'});
+}
+
+// ══════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════
+let modalAction = null;
+function showModal(title, msg, onConfirm) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-msg').textContent   = msg;
+  document.getElementById('modal').classList.add('show');
+  modalAction = onConfirm || null;
+  document.getElementById('modal-confirm').onclick = modalAction ? modalAction : closeModal;
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+  modalAction = null;
+}
+
+// ══════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(() => t.className = 'toast', 3500);
+}
+</script>
+</body>
+</html>

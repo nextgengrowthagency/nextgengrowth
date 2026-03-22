@@ -471,3 +471,274 @@ app.listen(PORT, () => {
   console.log(`📄 Brand      → http://localhost:${PORT}/brand-dashboard`);
   console.log(`🔌 Health     → http://localhost:${PORT}/api/health\n`);
 });
+
+// ═══════════════════════════════════════════
+// ADMIN ROUTES — Sirf tere liye!
+// ═══════════════════════════════════════════
+
+// Admin credentials — .env mein rakhna production pe
+const ADMIN_EMAIL    = process.env.ADMIN_EMAIL    || "admin@nextgengrowth.in";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "NGG@Admin2026";
+
+// Admin login
+app.post("/api/admin/login", (req, res) => {
+  const { email, password } = req.body;
+  if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+    const token = jwt.sign({ role: "admin", email }, JWT_SECRET, { expiresIn: "1d" });
+    res.json({ success: true, token, message: "Welcome back, Admin! 👑" });
+  } else {
+    res.status(401).json({ success: false, message: "Invalid admin credentials." });
+  }
+});
+
+// Admin auth middleware
+function adminOnly(req, res, next) {
+  const token = (req.headers["authorization"] || "").split(" ")[1];
+  if (!token) return res.status(401).json({ success: false, message: "No token." });
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (decoded.role !== "admin") return res.status(403).json({ success: false, message: "Admins only." });
+    req.admin = decoded;
+    next();
+  } catch {
+    res.status(403).json({ success: false, message: "Invalid token." });
+  }
+}
+
+// Admin — Full stats overview
+app.get("/api/admin/stats", adminOnly, (req, res) => {
+  try {
+    const totalUsers     = db.prepare("SELECT COUNT(*) as c FROM users").get().c;
+    const totalStudents  = db.prepare("SELECT COUNT(*) as c FROM users WHERE role='student'").get().c;
+    const totalBrands    = db.prepare("SELECT COUNT(*) as c FROM users WHERE role='brand'").get().c;
+    const totalProjects  = db.prepare("SELECT COUNT(*) as c FROM brand_projects").get().c;
+    const totalApps      = db.prepare("SELECT COUNT(*) as c FROM applications").get().c;
+    const totalEarnings  = db.prepare("SELECT COALESCE(SUM(amount),0) as t FROM earnings WHERE status='paid'").get().t;
+    const pendingEarnings= db.prepare("SELECT COALESCE(SUM(amount),0) as t FROM earnings WHERE status='pending'").get().t;
+    const openProjects   = db.prepare("SELECT COUNT(*) as c FROM brand_projects WHERE status='open'").get().c;
+    const acceptedApps   = db.prepare("SELECT COUNT(*) as c FROM applications WHERE status='accepted'").get().c;
+    const todaySignups   = db.prepare("SELECT COUNT(*) as c FROM users WHERE createdAt >= date('now')").get().c;
+
+    res.json({
+      success: true,
+      stats: {
+        totalUsers, totalStudents, totalBrands,
+        totalProjects, openProjects,
+        totalApps, acceptedApps,
+        totalEarnings, pendingEarnings,
+        todaySignups
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error." });
+  }
+});
+
+// Admin — Get all users
+app.get("/api/admin/users", adminOnly, (req, res) => {
+  try {
+    const users = db.prepare("SELECT id,firstName,lastName,email,role,college,skills,createdAt FROM users ORDER BY createdAt DESC").all();
+    const result = users.map(u => ({
+      ...u,
+      skills: u.skills ? JSON.parse(u.skills) : [],
+      name: `${u.firstName} ${u.lastName}`
+    }));
+    res.json({ success: true, users: result });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error." });
+  }
+});
+
+// Admin — Delete / Ban user
+app.delete("/api/admin/user/:id", adminOnly, (req, res) => {
+  try {
+    const user = db.prepare("SELECT * FROM users WHERE id=?").get(req.params.id);
+    if (!user) return res.status(404).json({ success: false, message: "User not found." });
+    db.prepare("DELETE FROM users WHERE id=?").run(req.params.id);
+    db.prepare("DELETE FROM applications WHERE studentId=?").run(req.params.id);
+    console.log(`🚫 Admin deleted user: ${user.email}`);
+    res.json({ success: true, message: `User ${user.email} deleted.` });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error." });
+  }
+});
+
+// Admin — Get all projects
+app.get("/api/admin/projects", adminOnly, (req, res) => {
+  try {
+    const projects = db.prepare(`
+      SELECT p.*, u.firstName, u.lastName, u.email as brandEmail
+      FROM brand_projects p
+      JOIN users u ON p.brandId = u.id
+      ORDER BY p.createdAt DESC
+    `).all();
+    res.json({ success: true, projects });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error." });
+  }
+});
+
+// Admin — Delete project
+app.delete("/api/admin/project/:id", adminOnly, (req, res) => {
+  try {
+    db.prepare("DELETE FROM brand_projects WHERE id=?").run(req.params.id);
+    res.json({ success: true, message: "Project deleted." });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error." });
+  }
+});
+
+// Admin — Get all applications
+app.get("/api/admin/applications", adminOnly, (req, res) => {
+  try {
+    const apps = db.prepare(`
+      SELECT a.*, u.firstName, u.lastName, u.email as studentEmail
+      FROM applications a
+      JOIN users u ON a.studentId = u.id
+      ORDER BY a.appliedAt DESC
+    `).all();
+    res.json({ success: true, applications: apps });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error." });
+  }
+});
+
+// Admin — Update application status
+app.put("/api/admin/application/:id", adminOnly, (req, res) => {
+  try {
+    const { status } = req.body;
+    db.prepare("UPDATE applications SET status=? WHERE id=?").run(status, req.params.id);
+    res.json({ success: true, message: `Application ${status}.` });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error." });
+  }
+});
+
+// Admin — Get all transactions
+app.get("/api/admin/transactions", adminOnly, (req, res) => {
+  try {
+    const txs = db.prepare(`
+      SELECT e.*, u.firstName, u.lastName, u.email
+      FROM earnings e
+      JOIN users u ON e.studentId = u.id
+      ORDER BY e.createdAt DESC
+    `).all();
+    res.json({ success: true, transactions: txs });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error." });
+  }
+});
+
+// Admin — Add manual earning / payment
+app.post("/api/admin/earning", adminOnly, (req, res) => {
+  try {
+    const { studentId, amount, description, status } = req.body;
+    const id = generateId();
+    db.prepare("INSERT INTO earnings (id,studentId,amount,description,status,createdAt) VALUES (?,?,?,?,?,?)")
+      .run(id, studentId, amount, description || "Manual payment", status || "paid", new Date().toISOString());
+    res.json({ success: true, message: "Earning added!" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error." });
+  }
+});
+
+// Admin page route
+app.get("/admin", (req, res) => res.sendFile(path.join(__dirname, "public", "admin.html")));
+app.get("/admin/login", (req, res) => res.sendFile(path.join(__dirname, "public", "admin.html")));
+
+console.log("👑 Admin routes loaded → /admin");
+
+// ═══════════════════════════════════════════
+// ADMIN ROUTES (sirf admin access kar sakta)
+// ═══════════════════════════════════════════
+
+function verifyAdmin(req, res, next) {
+  const adminKey = req.headers['x-admin-key'];
+  if (adminKey !== 'ngg_admin_2026') {
+    return res.status(403).json({ success: false, message: 'Admin access only.' });
+  }
+  next();
+}
+
+// Admin: sab users dekho
+app.get('/api/admin/users', verifyAdmin, (req, res) => {
+  try {
+    const users = db.prepare('SELECT * FROM users ORDER BY createdAt DESC').all();
+    const safe  = users.map(u => {
+      const { password, ...s } = u;
+      s.skills = s.skills ? JSON.parse(s.skills) : [];
+      s.name   = `${s.firstName} ${s.lastName}`;
+      return s;
+    });
+    res.json({ success: true, users: safe });
+  } catch(err) {
+    res.status(500).json({ success: false, message: 'Error.' });
+  }
+});
+
+// Admin: sab projects dekho
+app.get('/api/admin/projects', verifyAdmin, (req, res) => {
+  try {
+    const projects = db.prepare(`
+      SELECT p.*, u.firstName, u.lastName, u.companyName
+      FROM brand_projects p
+      LEFT JOIN users u ON p.brandId = u.id
+      ORDER BY p.createdAt DESC
+    `).all();
+    res.json({ success: true, projects });
+  } catch(err) {
+    res.status(500).json({ success: false, message: 'Error.' });
+  }
+});
+
+// Admin: sab applications dekho
+app.get('/api/admin/applications', verifyAdmin, (req, res) => {
+  try {
+    const apps = db.prepare(`
+      SELECT a.*, u.firstName, u.lastName
+      FROM applications a
+      LEFT JOIN users u ON a.studentId = u.id
+      ORDER BY a.appliedAt DESC
+    `).all();
+    const withNames = apps.map(a => ({
+      ...a,
+      studentName: a.firstName + ' ' + a.lastName
+    }));
+    res.json({ success: true, applications: withNames });
+  } catch(err) {
+    res.status(500).json({ success: false, message: 'Error.' });
+  }
+});
+
+// Admin: sab transactions dekho
+app.get('/api/admin/transactions', verifyAdmin, (req, res) => {
+  try {
+    const txs = db.prepare(`
+      SELECT e.*, u.firstName, u.lastName
+      FROM earnings e
+      LEFT JOIN users u ON e.studentId = u.id
+      ORDER BY e.createdAt DESC
+    `).all();
+    const withNames = txs.map(t => ({
+      ...t,
+      studentName: t.firstName + ' ' + t.lastName
+    }));
+    res.json({ success: true, transactions: withNames });
+  } catch(err) {
+    res.status(500).json({ success: false, message: 'Error.' });
+  }
+});
+
+// Admin: user ban/unban
+app.put('/api/admin/user/:id/ban', verifyAdmin, (req, res) => {
+  try {
+    const { banned } = req.body;
+    db.prepare('UPDATE users SET banned=? WHERE id=?').run(banned ? 1 : 0, req.params.id);
+    res.json({ success: true, message: `User ${banned ? 'banned' : 'unbanned'}` });
+  } catch(err) {
+    res.status(500).json({ success: false, message: 'Error.' });
+  }
+});
+
+// Admin page serve karo
+app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
