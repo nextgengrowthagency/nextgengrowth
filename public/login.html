@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login – NextGenGrowth</title>
+  <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green-deep:   #064e2b;
+      --green-mid:    #0a7c44;
+      --green-bright: #00c96b;
+      --green-glow:   #00ff88;
+      --green-light:  #e8fdf2;
+      --green-pale:   #f0fdf6;
+      --white:        #ffffff;
+      --off-white:    #f9fefb;
+      --text-dark:    #0a1f12;
+      --text-mid:     #2d5a3d;
+      --text-muted:   #6b8f77;
+      --border:       #c3e8d1;
+      --shadow:       rgba(0,201,107,0.15);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Outfit', sans-serif;
+      background: var(--white);
+      color: var(--text-dark);
+      overflow: hidden;
+    }
+
+    /* ── Canvas BG ── */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Layout ── */
+    .page {
+      display: flex;
+      height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── LEFT ── */
+    .left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 48px 52px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .left-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+    }
+
+    .blob1 {
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, rgba(0,201,107,0.25), transparent 70%);
+      top: -100px; left: -100px;
+      animation: blobFloat 8s ease-in-out infinite;
+    }
+
+    .blob2 {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(0,255,136,0.12), transparent 70%);
+      bottom: -60px; right: 60px;
+      animation: blobFloat 10s ease-in-out infinite reverse;
+    }
+
+    @keyframes blobFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(20px, -30px) scale(1.05); }
+      66% { transform: translate(-15px, 20px) scale(0.97); }
+    }
+
+    .logo {
+      font-family: 'Clash Display', sans-serif;
+      font-weight: 700;
+      font-size: 1.6rem;
+      color: var(--text-dark);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+    }
+
+    .logo-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--green-bright);
+      box-shadow: 0 0 12px var(--green-glow);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 8px var(--green-glow); transform: scale(1); }
+      50% { box-shadow: 0 0 20px var(--green-glow), 0 0 40px rgba(0,255,136,0.3); transform: scale(1.2); }
+    }
+
+    .logo span { color: var(--green-mid); }
+
+    /* Hero text */
+    .left-main { position: relative; z-index: 2; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--green-light);
+      border: 1px solid var(--border);
+      color: var(--green-mid);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+      opacity: 0;
+    }
+
+    .pill-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green-bright);
+      animation: pulse 2s infinite;
+    }
+
+    .hero-heading {
+      font-family: 'Clash Display', sans-serif;
+      font-size: clamp(2.4rem, 4vw, 3.6rem);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -1.5px;
+      color: var(--text-dark);
+      margin-bottom: 20px;
+      opacity: 0;
+    }
+
+    .hero-heading .line { display: block; overflow: hidden; }
+    .hero-heading .line span { display: block; }
+
+    .hero-heading .accent {
+      color: transparent;
+      -webkit-text-stroke: 2px var(--green-mid);
+    }
+
+    .hero-sub {
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.7;
+      max-width: 380px;
+      margin-bottom: 44px;
+      opacity: 0;
+    }
+
+    /* Stats */
+    .stats-grid {
+      display: flex;
+      gap: 0;
+      opacity: 0;
+    }
+
+    .stat-item {
+      flex: 1;
+      padding: 20px 24px;
+      border: 1px solid var(--border);
+      border-right: none;
+      background: var(--white);
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+
+    .stat-item:first-child { border-radius: 14px 0 0 14px; }
+    .stat-item:last-child { border-radius: 0 14px 14px 0; border-right: 1px solid var(--border); }
+
+    .stat-item::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--green-bright), var(--green-glow));
+      transform: scaleX(0);
+      transition: transform 0.4s ease;
+      transform-origin: left;
+    }
+
+    .stat-item:hover::after { transform: scaleX(1); }
+    .stat-item:hover { background: var(--green-pale); }
+
+    .stat-num {
+      font-family: 'Clash Display', sans-serif;
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    /* Testimonial */
+    .testimonial {
+      background: var(--green-pale);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--green-bright);
+      border-radius: 12px;
+      padding: 20px 22px;
+      max-width: 400px;
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+    }
+
+    .quote-icon {
+      font-size: 2rem;
+      line-height: 1;
+      color: var(--green-bright);
+      font-family: Georgia, serif;
+      margin-bottom: 8px;
+    }
+
+    .testimonial p {
+      font-size: 0.88rem;
+      color: var(--text-mid);
+      line-height: 1.65;
+      margin-bottom: 14px;
+    }
+
+    .t-author {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .t-avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--green-bright), var(--green-deep));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.78rem; font-weight: 700; color: white;
+      flex-shrink: 0;
+    }
+
+    .t-info strong { display: block; font-size: 0.83rem; color: var(--text-dark); }
+    .t-info span { font-size: 0.73rem; color: var(--text-muted); }
+
+    /* ── RIGHT ── */
+    .right {
+      width: 460px;
+      flex-shrink: 0;
+      background: var(--white);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 52px 48px;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .right::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--green-bright), var(--green-glow), var(--green-mid));
+      background-size: 200%;
+      animation: gradientMove 3s linear infinite;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0%; }
+      100% { background-position: 200%; }
+    }
+
+    .form-head { margin-bottom: 32px; opacity: 0; }
+
+    .form-head h2 {
+      font-family: 'Clash Display', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+
+    .form-head p { font-size: 0.9rem; color: var(--text-muted); }
+    .form-head p a { color: var(--green-mid); font-weight: 600; text-decoration: none; }
+    .form-head p a:hover { text-decoration: underline; }
+
+    /* Role toggle */
+    .role-toggle {
+      display: flex;
+      background: var(--green-pale);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 26px;
+      opacity: 0;
+    }
+
+    .role-btn {
+      flex: 1;
+      padding: 10px 14px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .role-btn.active {
+      background: var(--white);
+      color: var(--green-deep);
+      font-weight: 600;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      transform: scale(1.02);
+    }
+
+    /* Form */
+    .form-body { opacity: 0; }
+
+    .fgroup { margin-bottom: 18px; }
+
+    .fgroup label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-mid);
+      margin-bottom: 7px;
+      letter-spacing: 0.2px;
+    }
+
+    .input-wrap { position: relative; }
+
+    .input-icon {
+      position: absolute;
+      left: 14px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      width: 17px; height: 17px;
+      pointer-events: none;
+      transition: color 0.2s;
+    }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"] {
+      width: 100%;
+      background: var(--off-white);
+      border: 1.5px solid var(--border);
+      border-radius: 11px;
+      padding: 13px 14px 13px 44px;
+      color: var(--text-dark);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.93rem;
+      outline: none;
+      transition: all 0.25s;
+    }
+
+    input::placeholder { color: #b0c9bb; }
+
+    input:focus {
+      border-color: var(--green-bright);
+      background: var(--white);
+      box-shadow: 0 0 0 4px rgba(0,201,107,0.1);
+    }
+
+    input:focus ~ .input-icon,
+    .input-wrap:focus-within .input-icon { color: var(--green-bright); }
+
+    /* Floating label effect on focus */
+    .fgroup:focus-within label { color: var(--green-mid); }
+
+    .eye-btn {
+      position: absolute;
+      right: 14px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      display: flex; align-items: center;
+      transition: color 0.2s;
+    }
+
+    .eye-btn:hover { color: var(--green-mid); }
+
+    .form-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+
+    .check-label {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.84rem; color: var(--text-muted);
+      cursor: pointer; user-select: none;
+    }
+
+    .check-label input { display: none; }
+
+    .custom-check {
+      width: 18px; height: 18px;
+      border: 2px solid var(--border);
+      border-radius: 5px;
+      background: var(--white);
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .check-label input:checked ~ .custom-check {
+      background: var(--green-bright);
+      border-color: var(--green-bright);
+    }
+
+    .check-label input:checked ~ .custom-check::after {
+      content: '';
+      width: 5px; height: 9px;
+      border: 2px solid white;
+      border-top: none; border-left: none;
+      transform: rotate(45deg) translateY(-1px);
+    }
+
+    .forgot { font-size: 0.84rem; color: var(--green-mid); font-weight: 500; text-decoration: none; }
+    .forgot:hover { text-decoration: underline; }
+
+    /* Submit btn */
+    .btn-submit {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--green-mid), var(--green-deep));
+      color: white;
+      font-family: 'Clash Display', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 18px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(0,201,107,0.25);
+    }
+
+    .btn-submit::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--green-bright), var(--green-mid));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,201,107,0.35); }
+    .btn-submit:hover::before { opacity: 1; }
+    .btn-submit:active { transform: translateY(0); }
+
+    .btn-submit span { position: relative; z-index: 1; }
+
+    /* Ripple effect */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      transform: scale(0);
+      animation: rippleAnim 0.6s linear;
+      pointer-events: none;
+    }
+
+    @keyframes rippleAnim {
+      to { transform: scale(4); opacity: 0; }
+    }
+
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 18px;
+      font-size: 0.78rem; color: var(--text-muted);
+    }
+
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    .btn-google {
+      width: 100%;
+      padding: 13px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      background: transparent;
+      color: var(--text-dark);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.92rem; font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+
+    .btn-google:hover {
+      background: var(--green-pale);
+      border-color: var(--green-bright);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 32px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--text-dark);
+      color: white;
+      padding: 14px 24px;
+      border-radius: 100px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      z-index: 999;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+      opacity: 0;
+      white-space: nowrap;
+      max-width: 90vw;
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast.success { background: var(--green-mid); }
+    .toast.error { background: #dc2626; }
+
+    /* Loading spinner */
+    .spinner {
+      display: inline-block;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      html, body { overflow: auto; }
+      .page { flex-direction: column; height: auto; }
+      .left { padding: 36px 28px; }
+      .right { width: 100%; padding: 36px 28px; border-left: none; border-top: 1px solid var(--border); }
+      .testimonial { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="page">
+  <!-- LEFT -->
+  <div class="left">
+    <div class="left-blob blob1"></div>
+    <div class="left-blob blob2"></div>
+
+    <a href="/" class="logo" id="logo">
+      <div class="logo-dot"></div>
+      NextGen<span>Growth</span>
+    </a>
+
+    <div class="left-main">
+      <div class="pill" id="pill">
+        <span class="pill-dot"></span>
+        Student-Powered Studio
+      </div>
+
+      <h1 class="hero-heading" id="hero">
+        <span class="line"><span>Where Skills</span></span>
+        <span class="line"><span>Meet <span class="accent">Opportunity</span></span></span>
+      </h1>
+
+      <p class="hero-sub" id="sub">
+        Join thousands of students earning real money — or hire brilliant student talent for your brand. Built in India, scaling globally.
+      </p>
+
+      <div class="stats-grid" id="stats">
+        <div class="stat-item">
+          <span class="stat-num" data-target="500">0</span>
+          <div class="stat-label">Students</div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num" data-target="120">0</span>
+          <div class="stat-label">Projects</div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num" data-target="98">0</span>
+          <div class="stat-label">% Happy</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonial" id="testimonial">
+      <div class="quote-icon">"</div>
+      <p>Got my first paid project within a week. NextGenGrowth actually connects you with real brands — not just dummy work.</p>
+      <div class="t-author">
+        <div class="t-avatar">AS</div>
+        <div class="t-info">
+          <strong>Aryan Sharma</strong>
+          <span>Web Developer · Delhi University</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+    <div class="form-head" id="fhead">
+      <h2>Welcome back 👋</h2>
+      <p>New here? <a href="/register">Create a free account →</a></p>
+    </div>
+
+    <div class="role-toggle" id="rtoggle">
+      <button class="role-btn active" onclick="setRole(this,'student')">🎓 Student</button>
+      <button class="role-btn" onclick="setRole(this,'brand')">🏢 Brand</button>
+    </div>
+
+    <div class="form-body" id="fbody">
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="fgroup">
+          <label>Email Address</label>
+          <div class="input-wrap">
+            <svg class="input-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            <input type="email" id="email" placeholder="you@example.com" autocomplete="email" required/>
+          </div>
+        </div>
+
+        <div class="fgroup">
+          <label>Password</label>
+          <div class="input-wrap">
+            <svg class="input-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            <input type="password" id="password" placeholder="Your password" autocomplete="current-password" required/>
+            <button type="button" class="eye-btn" onclick="togglePwd('password',this)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-meta">
+          <label class="check-label">
+            <input type="checkbox" id="remember"/>
+            <span class="custom-check"></span>
+            Remember me
+          </label>
+          <a href="#" class="forgot">Forgot password?</a>
+        </div>
+
+        <button class="btn-submit" type="submit" id="submitBtn">
+          <span id="btnText">Log In →</span>
+        </button>
+
+        <div class="divider">or continue with</div>
+
+        <button type="button" class="btn-google">
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Continue with Google
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── Animated particle canvas ──────────────────────────────
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+
+  class Particle {
+    constructor() { this.reset(); }
+    reset() {
+      this.x = Math.random() * W;
+      this.y = Math.random() * H;
+      this.r = Math.random() * 3 + 1;
+      this.alpha = Math.random() * 0.18 + 0.04;
+      this.vx = (Math.random() - 0.5) * 0.4;
+      this.vy = -Math.random() * 0.5 - 0.2;
+      this.life = 1;
+    }
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      this.life -= 0.003;
+      if (this.life <= 0 || this.y < -10) this.reset();
+    }
+    draw() {
+      ctx.save();
+      ctx.globalAlpha = this.alpha * this.life;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.fillStyle = '#00c96b';
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  for (let i = 0; i < 60; i++) {
+    const p = new Particle();
+    p.y = Math.random() * H; // spread initially
+    particles.push(p);
+  }
+
+  function animCanvas() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(animCanvas);
+  }
+  animCanvas();
+
+  // ── GSAP Entry Animations ─────────────────────────────────
+  const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+  tl
+    .to('#logo',         { opacity: 1, y: 0, duration: 0.6, from: { y: -20 } })
+    .to('#pill',         { opacity: 1, y: 0, duration: 0.5, from: { y: 20 } }, '-=0.3')
+    .to('.hero-heading .line span', {
+      opacity: 1, y: 0, duration: 0.7, stagger: 0.12,
+      from: { y: 60, opacity: 0 }
+    }, '-=0.2')
+    .to('#sub',          { opacity: 1, y: 0, duration: 0.5, from: { y: 20 } }, '-=0.3')
+    .to('#stats',        { opacity: 1, y: 0, duration: 0.5, from: { y: 20 } }, '-=0.2')
+    .to('#testimonial',  { opacity: 1, y: 0, duration: 0.5, from: { y: 20 } }, '-=0.1')
+    .to('#fhead',        { opacity: 1, x: 0, duration: 0.5, from: { x: 30 } }, '-=0.4')
+    .to('#rtoggle',      { opacity: 1, x: 0, duration: 0.5, from: { x: 30 } }, '-=0.35')
+    .to('#fbody',        { opacity: 1, x: 0, duration: 0.5, from: { x: 30 } }, '-=0.3');
+
+  // ── Counter animation ─────────────────────────────────────
+  document.querySelectorAll('.stat-num[data-target]').forEach(el => {
+    const target = +el.dataset.target;
+    gsap.fromTo(el,
+      { innerText: 0 },
+      {
+        innerText: target,
+        duration: 2,
+        delay: 0.8,
+        ease: 'power2.out',
+        snap: { innerText: 1 },
+        onUpdate() {
+          el.textContent = Math.round(+el.innerText) + (target === 98 ? '' : '+');
+        }
+      }
+    );
+  });
+
+  // ── Role state ────────────────────────────────────────────
+  let selectedRole = 'student';
+  function setRole(btn, role) {
+    document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedRole = role;
+  }
+
+  // ── Password toggle ───────────────────────────────────────
+  function togglePwd(id, btn) {
+    const inp = document.getElementById(id);
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    btn.style.color = inp.type === 'text' ? 'var(--green-mid)' : '';
+  }
+
+  // ── Ripple on button ──────────────────────────────────────
+  document.querySelector('.btn-submit').addEventListener('click', function(e) {
+    const r = document.createElement('span');
+    r.className = 'ripple';
+    const rect = this.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    r.style.width = r.style.height = size + 'px';
+    r.style.left = (e.clientX - rect.left - size/2) + 'px';
+    r.style.top = (e.clientY - rect.top - size/2) + 'px';
+    this.appendChild(r);
+    setTimeout(() => r.remove(), 700);
+  });
+
+  // ── Toast ─────────────────────────────────────────────────
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => { t.className = 'toast'; }, 3500);
+  }
+
+  // ── Login Submit ──────────────────────────────────────────
+  async function handleLogin(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const btnText = document.getElementById('btnText');
+
+    btnText.innerHTML = '<span class="spinner"></span> Logging in...';
+    btn.disabled = true;
+
+    const payload = {
+      email: document.getElementById('email').value.trim(),
+      password: document.getElementById('password').value,
+      role: selectedRole
+    };
+
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        localStorage.setItem('ngg_token', data.token);
+        localStorage.setItem('ngg_user', JSON.stringify(data.user));
+        showToast(`${data.message}`, 'success');
+
+        gsap.to('.right', { x: -30, opacity: 0, duration: 0.4, ease: 'power2.in', onComplete: () => {
+          // Redirect to dashboard (create this page later)
+          if (data.user.role === 'student') {
+  window.location.href = '/dashboard';
+} else {
+  window.location.href = '/brand-dashboard';
+}
+        }});
+      } else {
+        showToast(data.message, 'error');
+        gsap.fromTo('.right', { x: -8 }, { x: 8, duration: 0.1, repeat: 4, yoyo: true, ease: 'none',
+          onComplete: () => gsap.set('.right', { x: 0 }) });
+      }
+    } catch {
+      showToast('Could not connect to server. Please try again.', 'error');
+    } finally {
+      btnText.innerHTML = 'Log In →';
+      btn.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>

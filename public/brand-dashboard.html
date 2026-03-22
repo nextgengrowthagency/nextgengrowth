@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Brand Dashboard – NextGenGrowth</title>
+  <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--gd:#1e3a5f;--gm:#1d4ed8;--gb:#3b82f6;--gg:#60a5fa;--gl:#eff6ff;--gp:#f0f7ff;--white:#fff;--off:#f8faff;--td:#0f172a;--tm:#1e40af;--ts:#64748b;--br:#bfdbfe;--sw:255px}
+    html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--off);color:var(--td);overflow:hidden}
+    .app{display:flex;height:100vh}
+    /* SIDEBAR */
+    .sidebar{width:var(--sw);background:var(--white);border-right:1px solid var(--br);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;z-index:20;position:relative}
+    .sidebar::after{content:'';position:absolute;bottom:-80px;left:-80px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(59,130,246,.07),transparent 70%);pointer-events:none}
+    .sb-logo{padding:20px 18px 16px;display:flex;align-items:center;gap:9px;font-family:'Clash Display',sans-serif;font-size:1.15rem;font-weight:700;color:var(--td);text-decoration:none;border-bottom:1px solid var(--br);flex-shrink:0}
+    .logo-dot{width:8px;height:8px;border-radius:50%;background:var(--gb);box-shadow:0 0 10px var(--gg);animation:pulse 2s infinite;flex-shrink:0}
+    @keyframes pulse{0%,100%{box-shadow:0 0 6px var(--gg);transform:scale(1)}50%{box-shadow:0 0 18px var(--gg);transform:scale(1.3)}}
+    .sb-logo span{color:var(--gm)}
+    .sb-user{margin:12px 10px;padding:11px 12px;background:var(--gp);border:1px solid var(--br);border-radius:11px;display:flex;align-items:center;gap:9px;flex-shrink:0}
+    .sb-av{width:36px;height:36px;border-radius:9px;flex-shrink:0;background:linear-gradient(135deg,var(--gb),var(--gd));display:flex;align-items:center;justify-content:center;font-family:'Clash Display',sans-serif;font-size:.85rem;font-weight:700;color:white}
+    .sb-nm{font-weight:600;font-size:.83rem;color:var(--td);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+    .sb-badge{display:inline-flex;align-items:center;gap:4px;background:var(--gl);border:1px solid var(--br);color:var(--gm);font-size:.63rem;font-weight:600;padding:2px 7px;border-radius:100px;margin-top:2px}
+    .nav{padding:6px 8px;flex:1;overflow-y:auto}
+    .nav-lbl{font-size:.63rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--ts);padding:9px 10px 4px}
+    .nav-item{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:9px;cursor:pointer;transition:all .2s;margin-bottom:1px;color:var(--ts);font-size:.85rem;font-weight:500;text-decoration:none;border:none;background:transparent;width:100%;text-align:left}
+    .nav-item:hover{background:var(--gp);color:var(--gm)}
+    .nav-item.active{background:var(--gm);color:white;box-shadow:0 3px 12px rgba(29,78,216,.25)}
+    .nav-icon{width:17px;height:17px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+    .nav-badge{margin-left:auto;background:var(--gb);color:white;font-size:.62rem;font-weight:700;padding:2px 6px;border-radius:100px}
+    .nav-item.active .nav-badge{background:rgba(255,255,255,.25);color:white}
+    .sb-foot{padding:10px;border-top:1px solid var(--br);flex-shrink:0}
+    .promo{background:linear-gradient(135deg,var(--gm),var(--gd));border-radius:11px;padding:13px;color:white;position:relative;overflow:hidden}
+    .promo::before{content:'';position:absolute;top:-20px;right:-20px;width:70px;height:70px;background:rgba(255,255,255,.08);border-radius:50%}
+    .promo h4{font-family:'Clash Display',sans-serif;font-size:.82rem;margin-bottom:3px}
+    .promo p{font-size:.7rem;opacity:.8;margin-bottom:9px;line-height:1.4}
+    .promo-btn{display:block;background:white;color:var(--gd);text-align:center;padding:6px;border-radius:7px;font-size:.76rem;font-weight:700;border:none;cursor:pointer;width:100%;transition:opacity .2s}
+    /* MAIN */
+    .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+    .topbar{background:var(--white);border-bottom:1px solid var(--br);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:relative}
+    .topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gb),var(--gg),var(--gm));background-size:200%;animation:gm 3s linear infinite}
+    @keyframes gm{0%{background-position:0%}100%{background-position:200%}}
+    .tb-l{display:flex;align-items:center;gap:12px}
+    .tb-title{font-family:'Clash Display',sans-serif;font-size:1.05rem;font-weight:700}
+    .tb-sub{font-size:.72rem;color:var(--ts)}
+    .tb-r{display:flex;align-items:center;gap:9px}
+    .icon-btn{width:34px;height:34px;border-radius:8px;background:var(--off);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;color:var(--ts);position:relative}
+    .icon-btn:hover{background:var(--gp);border-color:var(--gb);color:var(--gm)}
+    .ndot{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--gb);border:2px solid white;animation:pulse 2s infinite}
+    .tb-av{width:32px;height:32px;border-radius:8px;cursor:pointer;flex-shrink:0;background:linear-gradient(135deg,var(--gb),var(--gd));display:flex;align-items:center;justify-content:center;font-family:'Clash Display',sans-serif;font-size:.76rem;font-weight:700;color:white}
+    .menu-btn{display:none;background:none;border:none;cursor:pointer;color:var(--td);padding:4px}
+    .content{flex:1;overflow-y:auto;position:relative}
+    .page{display:none;padding:22px 26px;animation:fs .3s ease both}
+    .page.active{display:block}
+    @keyframes fs{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    /* REUSABLE */
+    .ph{margin-bottom:20px}
+    .ph h2{font-family:'Clash Display',sans-serif;font-size:1.45rem;font-weight:700;letter-spacing:-.5px;margin-bottom:4px}
+    .ph p{font-size:.86rem;color:var(--ts)}
+    .card{background:var(--white);border:1px solid var(--br);border-radius:14px;padding:18px}
+    .sec-t{font-family:'Clash Display',sans-serif;font-size:.92rem;font-weight:700;color:var(--td);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+    .sec-t .sa{margin-left:auto;font-family:'Outfit',sans-serif;font-size:.76rem;font-weight:600;color:var(--gm);cursor:pointer}
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .sc{background:var(--white);border:1px solid var(--br);border-radius:13px;padding:16px;position:relative;overflow:hidden;transition:all .3s}
+    .sc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gb),var(--gg));transform:scaleX(0);transform-origin:left;transition:transform .4s}
+    .sc:hover{transform:translateY(-2px);box-shadow:0 5px 20px rgba(0,0,0,.08);border-color:var(--gb)}
+    .sc:hover::after{transform:scaleX(1)}
+    .si{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.95rem;margin-bottom:11px}
+    .ib{background:var(--gl)}.it{background:#e0f7f4}.ig{background:#e8fdf2}.ia{background:#fef9e7}
+    .sn{font-family:'Clash Display',sans-serif;font-size:1.6rem;font-weight:700;color:var(--td);display:block}
+    .sl{font-size:.73rem;color:var(--ts);margin-top:2px}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:9px;font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;border:none;text-decoration:none}
+    .bp{background:linear-gradient(135deg,var(--gm),var(--gd));color:white;box-shadow:0 3px 12px rgba(29,78,216,.2)}
+    .bp:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(29,78,216,.3)}
+    .bo{background:transparent;border:1.5px solid var(--br);color:var(--tm)}
+    .bo:hover{background:var(--gp);border-color:var(--gb);color:var(--gm)}
+    .tag{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:100px;font-size:.68rem;font-weight:600}
+    .tn{background:var(--gl);color:var(--gm);border:1px solid var(--br)}
+    .tp{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
+    .ta{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
+    .tx{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
+    /* WELCOME BANNER */
+    .wb{background:linear-gradient(135deg,var(--gm),var(--gd));border-radius:16px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;position:relative;overflow:hidden}
+    .wb::before{content:'';position:absolute;top:-50px;right:100px;width:180px;height:180px;border-radius:50%;filter:blur(50px);background:rgba(147,197,253,.15)}
+    .wb-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:white;font-size:.66rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:100px;margin-bottom:9px}
+    .wb-t{font-family:'Clash Display',sans-serif;font-size:1.4rem;font-weight:700;color:white;letter-spacing:-.5px;margin-bottom:5px}
+    .wb-d{font-size:.82rem;color:rgba(255,255,255,.8);line-height:1.5;max-width:400px}
+    .wb-btn{display:inline-flex;align-items:center;gap:7px;background:white;color:var(--gd);padding:10px 18px;border-radius:10px;font-family:'Clash Display',sans-serif;font-size:.85rem;font-weight:700;border:none;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.14);transition:all .2s;position:relative;z-index:2}
+    .wb-btn:hover{transform:translateY(-2px)}
+    .h2c{display:grid;grid-template-columns:1fr 320px;gap:16px;margin-top:16px}
+    /* STUDENT CARDS */
+    .student-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+    .student-card{background:var(--white);border:1px solid var(--br);border-radius:13px;padding:16px;transition:all .25s;cursor:pointer}
+    .student-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08);border-color:var(--gb)}
+    .sc-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    .sc-av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#00c96b,#064e2b);display:flex;align-items:center;justify-content:center;font-family:'Clash Display',sans-serif;font-size:1rem;font-weight:700;color:white;flex-shrink:0}
+    .sc-name{font-weight:600;font-size:.9rem;color:var(--td);margin-bottom:2px}
+    .sc-college{font-size:.73rem;color:var(--ts)}
+    .sc-skills{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+    .sc-skill{padding:2px 8px;background:var(--gl);border:1px solid var(--br);border-radius:100px;font-size:.66rem;color:#166534;font-weight:500}
+    .sc-footer{display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid var(--br)}
+    .sc-stat{text-align:center}
+    .sc-stat-n{font-family:'Clash Display',sans-serif;font-size:.95rem;font-weight:700;color:var(--td)}
+    .sc-stat-l{font-size:.63rem;color:var(--ts)}
+    /* POST JOB FORM */
+    .fg{margin-bottom:14px}
+    .fg label{display:block;font-size:.77rem;font-weight:600;color:var(--tm);margin-bottom:5px}
+    .fg:focus-within label{color:var(--gm)}
+    .fi{width:100%;background:var(--off);border:1.5px solid var(--br);border-radius:9px;padding:10px 13px;color:var(--td);font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;transition:all .2s}
+    .fi:focus{border-color:var(--gb);background:white;box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+    .fi::placeholder{color:#93c5fd}
+    /* APPLICATIONS LIST */
+    .app-row{background:var(--white);border:1px solid var(--br);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:13px;transition:all .2s;margin-bottom:9px}
+    .app-row:hover{border-color:var(--gb);box-shadow:0 3px 12px rgba(0,0,0,.06)}
+    .app-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#00c96b,#064e2b);display:flex;align-items:center;justify-content:center;font-family:'Clash Display',sans-serif;font-size:.82rem;font-weight:700;color:white;flex-shrink:0}
+    .app-info{flex:1;min-width:0}
+    .app-name{font-weight:600;font-size:.88rem;color:var(--td);margin-bottom:2px}
+    .app-meta{font-size:.73rem;color:var(--ts);display:flex;gap:8px;flex-wrap:wrap}
+    .app-actions{display:flex;gap:7px;flex-shrink:0}
+    .btn-accept{padding:6px 12px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:7px;color:#166534;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s}
+    .btn-accept:hover{background:#166534;color:white}
+    .btn-reject{padding:6px 12px;background:#fef2f2;border:1.5px solid #fecaca;border-radius:7px;color:#dc2626;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s}
+    .btn-reject:hover{background:#dc2626;color:white}
+    /* PROFILE */
+    .pl{display:grid;grid-template-columns:260px 1fr;gap:16px}
+    .pcl{background:var(--white);border:1px solid var(--br);border-radius:14px;padding:22px;text-align:center}
+    .pav{width:72px;height:72px;border-radius:14px;margin:0 auto 12px;background:linear-gradient(135deg,var(--gb),var(--gd));display:flex;align-items:center;justify-content:center;font-family:'Clash Display',sans-serif;font-size:1.6rem;font-weight:700;color:white}
+    .pnm{font-family:'Clash Display',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:3px}
+    .pco{font-size:.8rem;color:var(--ts);margin-bottom:11px}
+    /* TOAST */
+    .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);padding:11px 20px;border-radius:100px;font-size:.83rem;font-weight:500;z-index:999;opacity:0;white-space:nowrap;transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .3s;max-width:90vw}
+    .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+    .toast.success{background:#166534;color:white}
+    .toast.error{background:#dc2626;color:white}
+    .toast.info{background:var(--td);color:white}
+    .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:5px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @media(max-width:860px){
+      .sidebar{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);transition:transform .3s}
+      .sidebar.open{transform:translateX(0)}
+      .menu-btn{display:flex}
+      html,body{overflow:auto}
+      .app{height:auto}
+      .h2c,.pl{grid-template-columns:1fr}
+      .g4{grid-template-columns:1fr 1fr}
+      .content{min-height:calc(100vh - 58px)}
+    }
+    .content::-webkit-scrollbar{width:3px}
+    .content::-webkit-scrollbar-thumb{background:var(--br);border-radius:100px}
+  </style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <a href="#" class="sb-logo"><div class="logo-dot"></div><span>NextGen<span>Growth</span></span></a>
+  <div class="sb-user">
+    <div class="sb-av" id="sbAv">?</div>
+    <div style="overflow:hidden">
+      <div class="sb-nm" id="sbNm">Loading...</div>
+      <div class="sb-badge">🏢 Brand</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <div class="nav-lbl">Main</div>
+    <button class="nav-item active" onclick="goTo('home',this)"><span class="nav-icon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>Dashboard</button>
+    <button class="nav-item" onclick="goTo('post',this)"><span class="nav-icon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg></span>Post a Project</button>
+    <button class="nav-item" onclick="goTo('applications',this)"><span class="nav-icon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></span>Applications<span class="nav-badge" id="appBadge">0</span></button>
+    <button class="nav-item" onclick="goTo('students',this)"><span class="nav-icon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></span>Browse Students</button>
+    <button class="nav-item" onclick="goTo('active',this)"><span class="nav-icon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></span>Active Projects</button>
+    <div class="nav-lbl">Account</div>
+    <button class="nav-item" onclick="goTo('profile',this)"><span class="nav-icon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></span>Brand Profile</button>
+    <button class="nav-item" onclick="logout()"><span class="nav-icon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></span>Logout</button>
+  </nav>
+  <div class="sb-foot">
+    <div class="promo">
+      <h4>🎓 500+ Students Ready!</h4>
+      <p>Talented students waiting for your projects.</p>
+      <button class="promo-btn" onclick="goTo('post',null)">Post a Project Now</button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <div class="tb-l">
+      <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div><div class="tb-title" id="pgTitle">Dashboard</div><div class="tb-sub" id="pgDate"></div></div>
+    </div>
+    <div class="tb-r">
+      <div class="icon-btn"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><span class="ndot"></span></div>
+      <div class="tb-av" id="tbAv">?</div>
+    </div>
+  </header>
+
+  <div class="content" id="mainContent">
+
+    <!-- HOME -->
+    <div class="page active" id="page-home">
+      <div class="wb">
+        <div style="position:relative;z-index:2">
+          <div class="wb-pill">🏢 Brand Account</div>
+          <div class="wb-t" id="wbGreet">Welcome! 👋</div>
+          <div class="wb-d">Post projects, receive applications from skilled students, and grow your brand affordably.</div>
+        </div>
+        <button class="wb-btn" onclick="goTo('post',null)">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+          Post a Project
+        </button>
+      </div>
+
+      <div class="g4" style="margin-bottom:20px">
+        <div class="sc"><div class="si ib">📢</div><span class="sn" id="stat-posted">0</span><div class="sl">Projects Posted</div></div>
+        <div class="sc"><div class="si ig">📋</div><span class="sn" id="stat-apps">0</span><div class="sl">Total Applications</div></div>
+        <div class="sc"><div class="si it">✅</div><span class="sn" id="stat-hired">0</span><div class="sl">Students Hired</div></div>
+        <div class="sc"><div class="si ia">💰</div><span class="sn" id="stat-spent">₹0</span><div class="sl">Total Spent</div></div>
+      </div>
+
+      <!-- Empty state for new brands -->
+      <div id="emptyState" class="card" style="text-align:center;padding:48px">
+        <div style="font-size:3rem;margin-bottom:14px">🚀</div>
+        <h3 style="font-family:'Clash Display',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:8px">Welcome to NextGenGrowth!</h3>
+        <p style="color:var(--ts);font-size:.88rem;line-height:1.6;max-width:400px;margin:0 auto 20px">You're all set as a brand. Post your first project and get applications from talented students within hours.</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <button class="btn bp" onclick="goTo('post',null)">📢 Post First Project</button>
+          <button class="btn bo" onclick="goTo('students',null)">🎓 Browse Students</button>
+        </div>
+      </div>
+
+      <!-- Active state (shown when brand has projects) -->
+      <div id="activeState" style="display:none">
+        <div class="h2c">
+          <div>
+            <div class="card" style="margin-bottom:14px">
+              <div class="sec-t">📋 Recent Applications<span class="sa" onclick="goTo('applications',null)">See all →</span></div>
+              <div id="recentApps"><div style="color:var(--ts);font-size:.83rem;padding:10px 0">No applications yet. Post a project to start receiving them!</div></div>
+            </div>
+            <div class="card">
+              <div class="sec-t">📢 Your Active Projects<span class="sa" onclick="goTo('active',null)">See all →</span></div>
+              <div id="activeProjects"><div style="color:var(--ts);font-size:.83rem;padding:10px 0">No active projects yet.</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="card">
+              <div class="sec-t">Quick Stats</div>
+              <div style="display:flex;flex-direction:column;gap:11px">
+                <div style="display:flex;justify-content:space-between;font-size:.83rem"><span style="color:var(--ts)">Avg. Time to Hire</span><span style="font-weight:600">2-3 days</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:.83rem"><span style="color:var(--ts)">Student Quality</span><span style="font-weight:600;color:var(--gm)">⭐ 4.8 avg</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:.83rem"><span style="color:var(--ts)">Cost vs Agency</span><span style="font-weight:600;color:#16a34a">Save 40%+</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POST A PROJECT -->
+    <div class="page" id="page-post">
+      <div class="ph"><h2>Post a Project 📢</h2><p>Describe your project and receive applications from matched students.</p></div>
+      <div style="display:grid;grid-template-columns:1fr 320px;gap:18px">
+        <div class="card">
+          <div class="sec-t" style="margin-bottom:18px">Project Details</div>
+          <div class="fg"><label>Project Title *</label><input class="fi" type="text" id="jobTitle" placeholder="e.g. Instagram Reels Editor for Fashion Brand"/></div>
+          <div class="g2">
+            <div class="fg"><label>Budget (₹) *</label><input class="fi" type="text" id="jobBudget" placeholder="e.g. 2500"/></div>
+            <div class="fg"><label>Deadline *</label>
+              <select class="fi" id="jobDeadline">
+                <option value="">Select deadline</option>
+                <option>1-2 days</option><option>3-5 days</option><option>1 week</option><option>2 weeks</option><option>1 month</option>
+              </select>
+            </div>
+          </div>
+          <div class="fg"><label>Skill Required *</label>
+            <select class="fi" id="jobSkill">
+              <option value="">Select skill</option>
+              <option>Video Editing</option><option>Graphic Design</option>
+              <option>Web Development</option><option>Content Writing</option>
+              <option>Social Media</option><option>Photography</option>
+            </select>
+          </div>
+          <div class="fg"><label>Project Description *</label><textarea class="fi" id="jobDesc" rows="4" placeholder="Describe what you need — be specific about deliverables, style references, formats needed..."></textarea></div>
+          <div class="fg"><label>Special Requirements (optional)</label><input class="fi" type="text" id="jobReqs" placeholder="e.g. Must know Premiere Pro, 1080p output required"/></div>
+          <div style="display:flex;gap:9px;margin-top:4px">
+            <button class="btn bp" id="postBtn" onclick="postProject()">📢 Post Project</button>
+            <button class="btn bo" onclick="clearForm()">Clear</button>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:12px">
+            <div class="sec-t">💡 Tips for Better Results</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;gap:9px;font-size:.82rem;color:var(--ts)"><span style="font-size:1rem">✅</span>Be specific about deliverables</div>
+              <div style="display:flex;gap:9px;font-size:.82rem;color:var(--ts)"><span style="font-size:1rem">✅</span>Mention software/tools needed</div>
+              <div style="display:flex;gap:9px;font-size:.82rem;color:var(--ts)"><span style="font-size:1rem">✅</span>Set a realistic budget</div>
+              <div style="display:flex;gap:9px;font-size:.82rem;color:var(--ts)"><span style="font-size:1rem">✅</span>Include reference examples</div>
+              <div style="display:flex;gap:9px;font-size:.82rem;color:var(--ts)"><span style="font-size:1rem">✅</span>Clear deadline helps students plan</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="sec-t">🎯 How It Works</div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;gap:10px;font-size:.82rem"><div style="width:22px;height:22px;border-radius:50%;background:var(--gm);color:white;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;flex-shrink:0">1</div><span style="color:var(--ts)">Post your project with details & budget</span></div>
+              <div style="display:flex;gap:10px;font-size:.82rem"><div style="width:22px;height:22px;border-radius:50%;background:var(--gm);color:white;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;flex-shrink:0">2</div><span style="color:var(--ts)">Matched students apply within hours</span></div>
+              <div style="display:flex;gap:10px;font-size:.82rem"><div style="width:22px;height:22px;border-radius:50%;background:var(--gm);color:white;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;flex-shrink:0">3</div><span style="color:var(--ts)">Review profiles & accept the best</span></div>
+              <div style="display:flex;gap:10px;font-size:.82rem"><div style="width:22px;height:22px;border-radius:50%;background:var(--gm);color:white;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;flex-shrink:0">4</div><span style="color:var(--ts)">Mentor reviews work before delivery</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- APPLICATIONS -->
+    <div class="page" id="page-applications">
+      <div class="ph"><h2>Applications 📋</h2><p>Review students who applied to your projects.</p></div>
+      <div id="appListBrand">
+        <div style="text-align:center;padding:48px;color:var(--ts)">
+          <div style="font-size:2.5rem;margin-bottom:12px">📭</div>
+          <h3 style="font-family:'Clash Display',sans-serif;color:var(--td);margin-bottom:6px">No applications yet</h3>
+          <p style="font-size:.83rem">Post a project to start receiving student applications.</p>
+          <button class="btn bp" style="margin-top:16px" onclick="goTo('post',null)">Post a Project →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BROWSE STUDENTS -->
+    <div class="page" id="page-students">
+      <div class="ph"><h2>Browse Students 🎓</h2><p>Discover talented students ready to work on your projects.</p></div>
+      <div class="student-grid">
+        <div class="student-card" onclick="showToast('Direct hire coming soon!','info')">
+          <div class="sc-top"><div class="sc-av">AS</div><div><div class="sc-name">Aryan Sharma</div><div class="sc-college">Delhi University · 2nd Year</div></div></div>
+          <div class="sc-skills"><span class="sc-skill">🎬 Video Editing</span><span class="sc-skill">📱 Social Media</span></div>
+          <div class="sc-footer"><div class="sc-stat"><div class="sc-stat-n">7</div><div class="sc-stat-l">Projects</div></div><div class="sc-stat"><div class="sc-stat-n">4.9⭐</div><div class="sc-stat-l">Rating</div></div><div class="sc-stat"><div class="sc-stat-n">₹2.5k</div><div class="sc-stat-l">Avg Rate</div></div><button class="btn bp" style="padding:6px 12px;font-size:.76rem" onclick="event.stopPropagation();showToast('Invite sent to Aryan! 🎉','success')">Invite</button></div>
+        </div>
+        <div class="student-card" onclick="showToast('Direct hire coming soon!','info')">
+          <div class="sc-top"><div class="sc-av" style="background:linear-gradient(135deg,#f59e0b,#b45309)">SG</div><div><div class="sc-name">Sneha Gupta</div><div class="sc-college">NIFT Delhi · 3rd Year</div></div></div>
+          <div class="sc-skills"><span class="sc-skill">🎨 Graphic Design</span><span class="sc-skill">📸 Photography</span></div>
+          <div class="sc-footer"><div class="sc-stat"><div class="sc-stat-n">12</div><div class="sc-stat-l">Projects</div></div><div class="sc-stat"><div class="sc-stat-n">5.0⭐</div><div class="sc-stat-l">Rating</div></div><div class="sc-stat"><div class="sc-stat-n">₹3k</div><div class="sc-stat-l">Avg Rate</div></div><button class="btn bp" style="padding:6px 12px;font-size:.76rem" onclick="event.stopPropagation();showToast('Invite sent to Sneha! 🎉','success')">Invite</button></div>
+        </div>
+        <div class="student-card" onclick="showToast('Direct hire coming soon!','info')">
+          <div class="sc-top"><div class="sc-av" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">RV</div><div><div class="sc-name">Rahul Verma</div><div class="sc-college">IIT Delhi · Final Year</div></div></div>
+          <div class="sc-skills"><span class="sc-skill">💻 Web Dev</span><span class="sc-skill">🤖 AI Tools</span></div>
+          <div class="sc-footer"><div class="sc-stat"><div class="sc-stat-n">5</div><div class="sc-stat-l">Projects</div></div><div class="sc-stat"><div class="sc-stat-n">4.8⭐</div><div class="sc-stat-l">Rating</div></div><div class="sc-stat"><div class="sc-stat-n">₹5k</div><div class="sc-stat-l">Avg Rate</div></div><button class="btn bp" style="padding:6px 12px;font-size:.76rem" onclick="event.stopPropagation();showToast('Invite sent to Rahul! 🎉','success')">Invite</button></div>
+        </div>
+        <div class="student-card" onclick="showToast('Direct hire coming soon!','info')">
+          <div class="sc-top"><div class="sc-av" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">PM</div><div><div class="sc-name">Priya Mehta</div><div class="sc-college">Miranda House · 1st Year</div></div></div>
+          <div class="sc-skills"><span class="sc-skill">✍️ Content Writing</span><span class="sc-skill">📊 Data</span></div>
+          <div class="sc-footer"><div class="sc-stat"><div class="sc-stat-n">3</div><div class="sc-stat-l">Projects</div></div><div class="sc-stat"><div class="sc-stat-n">4.7⭐</div><div class="sc-stat-l">Rating</div></div><div class="sc-stat"><div class="sc-stat-n">₹1.5k</div><div class="sc-stat-l">Avg Rate</div></div><button class="btn bp" style="padding:6px 12px;font-size:.76rem" onclick="event.stopPropagation();showToast('Invite sent to Priya! 🎉','success')">Invite</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIVE PROJECTS -->
+    <div class="page" id="page-active">
+      <div class="ph"><h2>Active Projects 📦</h2><p>Track projects currently in progress.</p></div>
+      <div id="activeProjectsList">
+        <div style="text-align:center;padding:48px;color:var(--ts)">
+          <div style="font-size:2.5rem;margin-bottom:12px">📭</div>
+          <h3 style="font-family:'Clash Display',sans-serif;color:var(--td);margin-bottom:6px">No active projects</h3>
+          <p style="font-size:.83rem">Post a project and hire a student to see it here.</p>
+          <button class="btn bp" style="margin-top:16px" onclick="goTo('post',null)">Post a Project →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="page" id="page-profile">
+      <div class="ph"><h2>Brand Profile 🏢</h2><p>Keep your brand profile updated to attract the best students.</p></div>
+      <div class="pl">
+        <div>
+          <div class="pcl" style="margin-bottom:12px">
+            <div class="pav" id="profAv">?</div>
+            <div class="pnm" id="profNm">Brand Name</div>
+            <div class="pco" id="profCo">Company</div>
+            <div style="margin-top:10px"><button class="btn bo" style="width:100%;justify-content:center;font-size:.8rem" onclick="showToast('Logo upload coming soon!','info')">🖼 Upload Logo</button></div>
+          </div>
+          <div class="card">
+            <div class="sec-t">Account Stats</div>
+            <div style="display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;justify-content:space-between;font-size:.83rem"><span style="color:var(--ts)">Member Since</span><span style="font-weight:600" id="memberSince">—</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:.83rem"><span style="color:var(--ts)">Email</span><span style="font-weight:600;font-size:.76rem" id="profileEmail">—</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:.83rem"><span style="color:var(--ts)">Projects Posted</span><span style="font-weight:600;color:var(--gm)" id="profilePosted">0</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="sec-t" style="margin-bottom:16px">Edit Brand Profile</div>
+          <div class="g2">
+            <div class="fg"><label>Contact First Name</label><input class="fi" type="text" id="pfn" placeholder="Rajesh"/></div>
+            <div class="fg"><label>Contact Last Name</label><input class="fi" type="text" id="pln" placeholder="Kumar"/></div>
+          </div>
+          <div class="fg"><label>Email</label><input class="fi" type="email" id="pem" placeholder="contact@yourbrand.com" readonly style="opacity:.7"/></div>
+          <div class="fg"><label>Company / Brand Name</label><input class="fi" type="text" id="pco" placeholder="Your Brand Pvt. Ltd."/></div>
+          <div class="fg"><label>Website URL</label><input class="fi" type="url" id="pweb" placeholder="https://yourbrand.com"/></div>
+          <div class="fg"><label>About Your Brand</label><textarea class="fi" id="pbio" rows="3" placeholder="Tell students about your brand, industry, and the type of work you offer..."></textarea></div>
+          <div class="fg"><label>Primary Need</label>
+            <select class="fi" id="pservice">
+              <option>Video Editing / Reels</option>
+              <option>Website Design & Development</option>
+              <option>Graphic Design</option>
+              <option>Content Writing / SEO</option>
+              <option>Social Media Management</option>
+              <option>Multiple Services</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:9px">
+            <button class="btn bp" id="saveBtn" onclick="saveProfile()">💾 Save Changes</button>
+            <button class="btn bo" onclick="showToast('Changes discarded','info')">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// AUTH GUARD
+const _tk = localStorage.getItem('ngg_token');
+const _u  = JSON.parse(localStorage.getItem('ngg_user') || 'null');
+if (!_tk || !_u) { window.location.href = '/login'; }
+if (_u && _u.role && _u.role !== 'brand') { window.location.href = '/login'; }
+
+// BRAND POSTED PROJECTS (stored locally for now)
+let postedProjects = JSON.parse(localStorage.getItem('brand_projects') || '[]');
+let brandApplications = JSON.parse(localStorage.getItem('brand_applications') || '[]');
+
+// LOAD USER DATA
+function loadUserData() {
+  if (!_u) return;
+  const name        = _u.name        || `${_u.firstName||''} ${_u.lastName||''}`.trim() || 'Brand';
+  const company     = _u.companyName || name;
+  const email       = _u.email       || '';
+  const joinDate    = _u.createdAt   ? new Date(_u.createdAt).toLocaleDateString('en-IN',{month:'long',year:'numeric'}) : '2026';
+  const parts       = name.split(' ').filter(Boolean);
+  const initials    = parts.length >= 2 ? (parts[0][0]+parts[parts.length-1][0]).toUpperCase() : (parts[0]||'B').slice(0,2).toUpperCase();
+
+  // Update all name/avatar fields
+  document.querySelectorAll('#sbAv,#tbAv,#profAv').forEach(el => el.textContent = initials);
+  document.getElementById('sbNm').textContent  = company || name;
+  document.getElementById('profNm').textContent= company || name;
+  document.getElementById('profCo').textContent= email;
+
+  // Greeting
+  const h = new Date().getHours();
+  const g = h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  const wbGreet = document.getElementById('wbGreet');
+  if (wbGreet) wbGreet.textContent = `${g}, ${parts[0]}! 👋`;
+
+  // Profile form
+  const fn = _u.firstName || parts[0] || '';
+  const ln = _u.lastName  || parts.slice(1).join(' ') || '';
+  const pf = document.getElementById('pfn'); if(pf) pf.value = fn;
+  const pl = document.getElementById('pln'); if(pl) pl.value = ln;
+  const pe = document.getElementById('pem'); if(pe) pe.value = email;
+  const pc = document.getElementById('pco'); if(pc) pc.value = _u.companyName || '';
+  const ms = document.getElementById('memberSince'); if(ms) ms.textContent = joinDate;
+  const profileEmail = document.getElementById('profileEmail'); if(profileEmail) profileEmail.textContent = email;
+
+  // Stats
+  updateStats();
+}
+
+function updateStats() {
+  document.getElementById('stat-posted').textContent = postedProjects.length;
+  document.getElementById('stat-apps').textContent = brandApplications.length;
+  document.getElementById('stat-hired').textContent = brandApplications.filter(a=>a.status==='accepted').length;
+  const spent = postedProjects.reduce((s,p) => s + (parseInt(p.budget)||0), 0);
+  document.getElementById('stat-spent').textContent = spent > 0 ? '₹'+spent.toLocaleString('en-IN') : '₹0';
+  const pp = document.getElementById('profilePosted'); if(pp) pp.textContent = postedProjects.length;
+  const ab = document.getElementById('appBadge'); if(ab) ab.textContent = brandApplications.filter(a=>a.status==='review').length || 0;
+
+  // Show empty vs active state
+  const empty  = document.getElementById('emptyState');
+  const active = document.getElementById('activeState');
+  if (empty && active) {
+    if (postedProjects.length === 0) { empty.style.display='block'; active.style.display='none'; }
+    else { empty.style.display='none'; active.style.display='block'; renderActiveProjects(); renderRecentApps(); }
+  }
+}
+
+// POST PROJECT
+function postProject() {
+  const title    = document.getElementById('jobTitle').value.trim();
+  const budget   = document.getElementById('jobBudget').value.trim();
+  const deadline = document.getElementById('jobDeadline').value;
+  const skill    = document.getElementById('jobSkill').value;
+  const desc     = document.getElementById('jobDesc').value.trim();
+
+  if (!title)    { showToast('Please enter a project title', 'error'); return; }
+  if (!budget)   { showToast('Please enter your budget', 'error'); return; }
+  if (!deadline) { showToast('Please select a deadline', 'error'); return; }
+  if (!skill)    { showToast('Please select a skill required', 'error'); return; }
+  if (!desc)     { showToast('Please describe your project', 'error'); return; }
+
+  const btn = document.getElementById('postBtn');
+  btn.innerHTML = '<span class="spin"></span> Posting...';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    const project = {
+      id: Date.now(), title, budget, deadline, skill, desc,
+      status: 'active', postedAt: new Date().toISOString(),
+      brandName: _u.companyName || _u.name || 'Your Brand',
+      applications: 0,
+    };
+    postedProjects.push(project);
+    localStorage.setItem('brand_projects', JSON.stringify(postedProjects));
+    updateStats();
+    clearForm();
+    showToast(`Project "${title}" posted! Students will apply soon 🎉`, 'success');
+    btn.innerHTML = '📢 Post Project';
+    btn.disabled = false;
+    goTo('active', null);
+  }, 1200);
+}
+
+function clearForm() {
+  ['jobTitle','jobBudget','jobDesc','jobReqs'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  ['jobDeadline','jobSkill'].forEach(id => { const el = document.getElementById(id); if(el) el.selectedIndex = 0; });
+}
+
+function renderActiveProjects() {
+  const el = document.getElementById('activeProjects');
+  const full = document.getElementById('activeProjectsList');
+  if (!postedProjects.length) return;
+
+  const html = postedProjects.slice(-3).reverse().map(p => `
+    <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--br)">
+      <div style="width:36px;height:36px;border-radius:9px;background:var(--gl);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0">📢</div>
+      <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:.85rem;color:var(--td);margin-bottom:2px">${p.title}</div><div style="font-size:.72rem;color:var(--ts)">${p.skill} · ₹${parseInt(p.budget).toLocaleString('en-IN')} · ${p.deadline}</div></div>
+      <span class="tag ta">Active</span>
+    </div>`).join('');
+
+  if (el) el.innerHTML = html;
+  if (full) full.innerHTML = postedProjects.length === 0
+    ? '<div style="text-align:center;padding:44px;color:var(--ts)"><div style="font-size:2.5rem;margin-bottom:12px">📭</div><h3 style="font-family:\'Clash Display\',sans-serif;color:var(--td);margin-bottom:6px">No active projects</h3><button class="btn bp" style="margin-top:16px" onclick="goTo(\'post\',null)">Post a Project →</button></div>'
+    : postedProjects.map(p => `
+      <div style="background:var(--white);border:1px solid var(--br);border-radius:12px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:14px">
+        <div style="width:42px;height:42px;border-radius:10px;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">📢</div>
+        <div style="flex:1"><div style="font-weight:600;font-size:.9rem;color:var(--td);margin-bottom:3px">${p.title}</div><div style="font-size:.75rem;color:var(--ts)">${p.skill} · Budget: ₹${parseInt(p.budget).toLocaleString('en-IN')} · Deadline: ${p.deadline}</div></div>
+        <div style="text-align:right"><span class="tag ta" style="display:block;margin-bottom:5px">✅ Active</span><div style="font-size:.72rem;color:var(--ts)">Posted ${new Date(p.postedAt).toLocaleDateString('en-IN')}</div></div>
+      </div>`).join('');
+}
+
+function renderRecentApps() {
+  const el = document.getElementById('recentApps');
+  if (!el) return;
+  if (!brandApplications.length) {
+    el.innerHTML = '<div style="color:var(--ts);font-size:.83rem;padding:10px 0">No applications yet. Students will apply to your posted projects.</div>';
+    return;
+  }
+  el.innerHTML = brandApplications.slice(-3).reverse().map(a => `
+    <div class="app-row">
+      <div class="app-av">${(a.studentName||'S').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase()}</div>
+      <div class="app-info"><div class="app-name">${a.studentName||'Student'}</div><div class="app-meta"><span>📢 ${a.jobTitle}</span><span>📅 ${new Date(a.appliedAt).toLocaleDateString('en-IN')}</span></div></div>
+      <div style="flex-shrink:0"><span class="tag tp">Under Review</span></div>
+    </div>`).join('');
+}
+
+// SAVE PROFILE
+async function saveProfile() {
+  const btn = document.getElementById('saveBtn');
+  btn.innerHTML = '<span class="spin"></span> Saving...';
+  btn.disabled = true;
+
+  const fn = document.getElementById('pfn').value.trim();
+  const ln = document.getElementById('pln').value.trim();
+  const co = document.getElementById('pco').value.trim();
+
+  if (!fn) { showToast('Enter your first name', 'error'); btn.innerHTML='💾 Save Changes'; btn.disabled=false; return; }
+
+  try {
+    const token = localStorage.getItem('ngg_token');
+    const res = await fetch('/api/profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer '+token },
+      body: JSON.stringify({ firstName:fn, lastName:ln, companyName:co })
+    });
+    const data = await res.json();
+    if (data.success) {
+      const updated = {..._u, ...data.user};
+      localStorage.setItem('ngg_user', JSON.stringify(updated));
+      Object.assign(_u, data.user);
+      loadUserData();
+      showToast('Profile saved! 🎉', 'success');
+    } else {
+      showToast(data.message||'Save failed','error');
+    }
+  } catch {
+    // Fallback
+    const updated = {..._u, firstName:fn, lastName:ln, name:`${fn} ${ln}`, companyName:co};
+    localStorage.setItem('ngg_user', JSON.stringify(updated));
+    Object.assign(_u, updated);
+    loadUserData();
+    showToast('Saved locally! 🎉', 'success');
+  }
+  btn.innerHTML = '💾 Save Changes';
+  btn.disabled = false;
+}
+
+// NAVIGATION
+const PAGE_TITLES = { home:'Dashboard', post:'Post a Project', applications:'Applications', students:'Browse Students', active:'Active Projects', profile:'Brand Profile' };
+
+function goTo(pg, navBtn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById('page-'+pg);
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (navBtn) navBtn.classList.add('active');
+  else document.querySelectorAll('.nav-item').forEach(n => { if((n.getAttribute('onclick')||'').includes("'"+pg+"'")) n.classList.add('active'); });
+  document.getElementById('pgTitle').textContent = PAGE_TITLES[pg]||'Dashboard';
+  if (pg === 'active') renderActiveProjects();
+  if (pg === 'applications') renderAppsList();
+  document.getElementById('mainContent').scrollTop = 0;
+  document.getElementById('sidebar').classList.remove('open');
+  gsap.fromTo('#page-'+pg, {opacity:0,y:10}, {opacity:1,y:0,duration:.28,ease:'power2.out'});
+}
+
+function renderAppsList() {
+  const el = document.getElementById('appListBrand');
+  if (!el) return;
+  if (!brandApplications.length) {
+    el.innerHTML = '<div style="text-align:center;padding:48px;color:var(--ts)"><div style="font-size:2.5rem;margin-bottom:12px">📭</div><h3 style="font-family:\'Clash Display\',sans-serif;color:var(--td);margin-bottom:6px">No applications yet</h3><p style="font-size:.83rem">Post a project to start receiving student applications.</p><button class="btn bp" style="margin-top:16px" onclick="goTo(\'post\',null)">Post a Project →</button></div>';
+    return;
+  }
+  el.innerHTML = brandApplications.map((a,i) => `
+    <div class="app-row">
+      <div class="app-av">${(a.studentName||'S').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase()}</div>
+      <div class="app-info"><div class="app-name">${a.studentName||'Student'}</div><div class="app-meta"><span>📢 ${a.jobTitle}</span><span>📅 ${new Date(a.appliedAt).toLocaleDateString('en-IN')}</span></div></div>
+      ${a.status==='review' ? `<div class="app-actions"><button class="btn-accept" onclick="updateApp(${i},'accepted')">✓ Accept</button><button class="btn-reject" onclick="updateApp(${i},'rejected')">✗ Reject</button></div>` : `<span class="tag ${a.status==='accepted'?'ta':'tx'}">${a.status==='accepted'?'✓ Accepted':'✗ Rejected'}</span>`}
+    </div>`).join('');
+}
+
+function updateApp(i, status) {
+  brandApplications[i].status = status;
+  localStorage.setItem('brand_applications', JSON.stringify(brandApplications));
+  updateStats();
+  renderAppsList();
+  showToast(status==='accepted'?'Student accepted! 🎉':'Application rejected','info');
+}
+
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className='toast '+type+' show';
+  setTimeout(()=>t.className='toast',3500);
+}
+
+function logout() {
+  gsap.to('.app',{opacity:0,duration:.3,onComplete:()=>{
+    localStorage.removeItem('ngg_token');
+    localStorage.removeItem('ngg_user');
+    window.location.href='/login';
+  }});
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  const d = new Date();
+  document.getElementById('pgDate').textContent = d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  loadUserData();
+  gsap.timeline({defaults:{ease:'power3.out'}})
+    .fromTo('.sidebar',{x:-20,opacity:0},{x:0,opacity:1,duration:.5})
+    .fromTo('.topbar',{y:-10,opacity:0},{y:0,opacity:1,duration:.4},'-=.3')
+    .fromTo('#page-home',{y:14,opacity:0},{y:0,opacity:1,duration:.4},'-=.2');
+});
+</script>
+</body>
+</html>
