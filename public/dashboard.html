@@ -2,52 +2,107 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <!-- ✅ MOBILE FIX 1: viewport tag correct hona chahiye -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <title>Dashboard – NextGenGrowth</title>
   <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --gd:#064e2b;--gm:#0a7c44;--gb:#00c96b;--gg:#00ff88;
-      --gl:#e8fdf2;--gp:#f0fdf6;--white:#fff;--off:#f7fdf9;
-      --td:#0a1f12;--tm:#2d5a3d;--ts:#6b8f77;--br:#d1ead9;
-      --sw:255px;
-      /* ✅ MOBILE FIX 2: safe area for iPhone notch */
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    :root{--gd:#064e2b;--gm:#0a7c44;--gb:#00c96b;--gg:#00ff88;--gl:#e8fdf2;--gp:#f0fdf6;--white:#fff;--off:#f7fdf9;--td:#0a1f12;--tm:#2d5a3d;--ts:#6b8f77;--br:#d1ead9;--sw:255px}
+
+    /* ══════════════════════════════
+       DESKTOP LAYOUT
+    ══════════════════════════════ */
+    html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--off);color:var(--td)}
+    .app{display:flex;height:100vh;overflow:hidden}
+    .sidebar{width:var(--sw);background:var(--white);border-right:1px solid var(--br);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;z-index:100}
+    .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+    .content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+    .page{display:none;padding:22px 24px 40px;animation:fs .3s ease both}
+    .page.active{display:block}
+    @keyframes fs{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+    /* ══════════════════════════════
+       MOBILE LAYOUT — MAIN FIX
+    ══════════════════════════════ */
+    @media(max-width:768px){
+      /* Reset everything for mobile */
+      html,body{height:auto;min-height:100vh;overflow-x:hidden}
+
+      /* App becomes vertical block */
+      .app{display:block;height:auto;min-height:100vh;overflow:visible}
+
+      /* Sidebar HIDDEN by default on mobile */
+      .sidebar{
+        position:fixed !important;
+        top:0 !important;
+        left:0 !important;
+        bottom:0 !important;
+        width:280px !important;
+        height:100vh !important;
+        transform:translateX(-100%) !important;
+        transition:transform 0.3s ease !important;
+        z-index:500 !important;
+        overflow-y:auto !important;
+      }
+      /* Sidebar OPEN state */
+      .sidebar.open{
+        transform:translateX(0) !important;
+        box-shadow:4px 0 20px rgba(0,0,0,.2) !important;
+      }
+
+      /* Main takes full screen */
+      .main{
+        width:100% !important;
+        display:flex !important;
+        flex-direction:column !important;
+        overflow:visible !important;
+      }
+
+      /* Content scrolls freely */
+      .content{overflow:visible;flex:none}
+
+      /* Page padding — extra bottom for nav bar */
+      .page{padding:14px 14px 80px !important}
+
+      /* Hide desktop search */
+      .sw-bar{display:none !important}
+
+      /* Show hamburger */
+      .mb{display:flex !important}
+
+      /* Grids */
+      .g4{grid-template-columns:1fr 1fr !important;gap:10px !important}
+      .g2{grid-template-columns:1fr !important}
+      .h2c{grid-template-columns:1fr !important}
+      .pl{grid-template-columns:1fr !important}
+      .pg{grid-template-columns:1fr !important}
+      .cg{grid-template-columns:1fr 1fr !important}
+      .mg{grid-template-columns:1fr 1fr !important}
+
+      /* Profile card horizontal on mobile */
+      .pcl{display:flex !important;flex-direction:row !important;align-items:center !important;gap:14px !important;text-align:left !important}
+      .pav{margin:0 !important;flex-shrink:0 !important;width:56px !important;height:56px !important;font-size:1.3rem !important}
+      .psk{justify-content:flex-start !important}
+
+      /* Show bottom nav */
+      .bottom-nav{display:grid !important}
+
+      /* Toast above bottom nav */
+      .toast{bottom:72px !important}
+
+      /* Headings smaller */
+      .ph h2{font-size:1.2rem !important}
     }
 
-    /* ✅ MOBILE FIX 3: html aur body pe overflow:hidden NAHI hona chahiye mobile pe */
-    html { height: 100%; }
-    body {
-      font-family:'Outfit',sans-serif;
-      background:var(--off);
-      color:var(--td);
-      min-height: 100%;
-      /* NO overflow:hidden here */
+    /* Very small phones */
+    @media(max-width:380px){
+      .cg{grid-template-columns:1fr !important}
+      .mg{grid-template-columns:1fr !important}
+      .g4{grid-template-columns:1fr 1fr !important}
     }
 
-    /* ✅ MOBILE FIX 4: Desktop pe fixed layout, mobile pe scroll */
-    .app {
-      display:flex;
-      /* Desktop: full viewport height */
-      height: 100vh;
-    }
-
-    /* ══ SIDEBAR ══ */
-    .sidebar{
-      width:var(--sw);
-      background:var(--white);
-      border-right:1px solid var(--br);
-      display:flex;
-      flex-direction:column;
-      flex-shrink:0;
-      overflow:hidden;
-      z-index:100;
-      position:relative;
-    }
+    /* ══ SIDEBAR STYLES ══ */
     .sidebar::after{content:'';position:absolute;bottom:-80px;left:-80px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(0,201,107,.07),transparent 70%);pointer-events:none}
     .sb-logo{padding:20px 18px 16px;display:flex;align-items:center;gap:9px;font-family:'Clash Display',sans-serif;font-size:1.15rem;font-weight:700;color:var(--td);text-decoration:none;border-bottom:1px solid var(--br);flex-shrink:0}
     .ld{width:8px;height:8px;border-radius:50%;background:var(--gb);box-shadow:0 0 10px var(--gg);animation:pulse 2s infinite;flex-shrink:0}
@@ -59,7 +114,7 @@
     .sb-bg{display:inline-flex;align-items:center;gap:4px;background:var(--gl);border:1px solid var(--br);color:var(--gm);font-size:.63rem;font-weight:600;padding:2px 7px;border-radius:100px;margin-top:2px}
     .nav{padding:6px 8px;flex:1;overflow-y:auto}
     .nl{font-size:.63rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--ts);padding:9px 10px 4px}
-    .ni{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:9px;cursor:pointer;transition:all .2s;margin-bottom:2px;color:var(--ts);font-size:.88rem;font-weight:500;border:none;background:transparent;width:100%;text-align:left}
+    .ni{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:9px;cursor:pointer;transition:all .2s;margin-bottom:2px;color:var(--ts);font-size:.86rem;font-weight:500;border:none;background:transparent;width:100%;text-align:left}
     .ni:hover{background:var(--gp);color:var(--gm)}
     .ni.active{background:var(--gm);color:white;box-shadow:0 3px 12px rgba(10,124,68,.25)}
     .nicon{width:18px;height:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
@@ -72,65 +127,34 @@
     .promo p{font-size:.7rem;opacity:.8;margin-bottom:9px;line-height:1.4}
     .pb{display:block;background:white;color:var(--gd);text-align:center;padding:6px;border-radius:7px;font-size:.76rem;font-weight:700;border:none;cursor:pointer;width:100%}
 
-    /* ══ MAIN ══ */
-    .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
-
     /* ══ TOPBAR ══ */
-    .topbar{
-      background:var(--white);
-      border-bottom:1px solid var(--br);
-      padding:0 20px;
-      height:58px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      flex-shrink:0;
-      position:relative;
-      /* ✅ MOBILE FIX 5: topbar sticky rahega upar */
-      position:sticky;
-      top:0;
-      z-index:50;
-    }
+    .topbar{background:var(--white);border-bottom:1px solid var(--br);padding:0 20px;height:58px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:50}
     .topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gb),var(--gg),var(--gm));background-size:200%;animation:gm 3s linear infinite}
     @keyframes gm{0%{background-position:0%}100%{background-position:200%}}
     .tl{display:flex;align-items:center;gap:10px}
     .tt{font-family:'Clash Display',sans-serif;font-size:1rem;font-weight:700}
     .ts_{font-size:.7rem;color:var(--ts)}
     .tr{display:flex;align-items:center;gap:8px}
-    .ib{width:34px;height:34px;border-radius:8px;background:var(--off);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;color:var(--ts);position:relative;flex-shrink:0}
-    .ib:hover{background:var(--gp);border-color:var(--gb);color:var(--gm)}
-    .nd{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--gb);border:2px solid white;animation:pulse 2s infinite}
-    .sw-bar{display:flex;align-items:center;gap:7px;background:var(--off);border:1px solid var(--br);border-radius:8px;padding:6px 12px;transition:all .2s}
-    .sw-bar:focus-within{border-color:var(--gb);background:white}
+    .ib{width:34px;height:34px;border-radius:8px;background:var(--off);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ts);position:relative;flex-shrink:0}
+    .nd{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--gb);border:2px solid white}
+    .sw-bar{display:flex;align-items:center;gap:7px;background:var(--off);border:1px solid var(--br);border-radius:8px;padding:6px 12px}
     .sw-bar svg{color:var(--ts);flex-shrink:0}
-    .sw-bar input{border:none;background:transparent;outline:none;font-family:'Outfit',sans-serif;font-size:.82rem;color:var(--td);width:130px}
+    .sw-bar input{border:none;background:transparent;outline:none;font-family:'Outfit',sans-serif;font-size:.82rem;color:var(--td);width:140px}
     .sw-bar input::placeholder{color:var(--ts)}
     .tav{width:32px;height:32px;border-radius:8px;cursor:pointer;flex-shrink:0;background:linear-gradient(135deg,var(--gb),var(--gd));display:flex;align-items:center;justify-content:center;font-family:'Clash Display',sans-serif;font-size:.76rem;font-weight:700;color:white}
-
-    /* ✅ MOBILE FIX 6: hamburger button - mobile pe dikhega */
+    /* Hamburger — hidden on desktop, shown on mobile */
     .mb{display:none;background:none;border:none;cursor:pointer;color:var(--td);padding:4px;flex-shrink:0}
 
-    /* ✅ MOBILE FIX 7: Content area - yahi main fix hai */
-    .content{
-      flex:1;
-      overflow-y:auto;
-      /* ✅ This allows scrolling inside content area on desktop */
-      -webkit-overflow-scrolling:touch; /* smooth scroll on iOS */
-    }
-
-    .page{display:none;padding:20px 20px 40px;animation:fs .3s ease both}
-    .page.active{display:block}
-    @keyframes fs{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-
-    /* ══ REUSABLE COMPONENTS ══ */
+    /* ══ REUSABLE ══ */
     .ph{margin-bottom:18px}
     .ph h2{font-family:'Clash Display',sans-serif;font-size:1.4rem;font-weight:700;letter-spacing:-.5px;margin-bottom:4px}
     .ph p{font-size:.85rem;color:var(--ts)}
     .card{background:var(--white);border:1px solid var(--br);border-radius:14px;padding:16px}
     .st{font-family:'Clash Display',sans-serif;font-size:.9rem;font-weight:700;color:var(--td);margin-bottom:12px;display:flex;align-items:center;gap:8px}
     .st .sa{margin-left:auto;font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:600;color:var(--gm);cursor:pointer}
-    .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .h2c{display:grid;grid-template-columns:1fr 300px;gap:14px;margin-top:14px}
     .sc{background:var(--white);border:1px solid var(--br);border-radius:12px;padding:14px;position:relative;overflow:hidden;transition:all .3s}
     .sc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gb),var(--gg));transform:scaleX(0);transform-origin:left;transition:transform .4s}
     .sc:hover{transform:translateY(-2px);box-shadow:0 5px 20px rgba(0,0,0,.08);border-color:var(--gb)}
@@ -139,9 +163,9 @@
     .ig{background:var(--gl)}.it{background:#e0f7f4}.ib2{background:#e8f0fe}.ia{background:#fef9e7}
     .sn{font-family:'Clash Display',sans-serif;font-size:1.5rem;font-weight:700;color:var(--td);display:block}
     .sl{font-size:.72rem;color:var(--ts);margin-top:2px}
-    .sc-{font-size:.67rem;font-weight:600;margin-top:4px;color:var(--gm)}
+    .sc-{font-size:.68rem;font-weight:600;margin-top:4px;color:var(--gm)}
     .sc-.empty{color:var(--ts)}
-    .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:9px;font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;border:none;text-decoration:none}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:9px;font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:600;cursor:pointer;transition:all .2s;border:none;text-decoration:none}
     .bpri{background:linear-gradient(135deg,var(--gm),var(--gd));color:white;box-shadow:0 3px 12px rgba(10,124,68,.2)}
     .bpri:hover{transform:translateY(-1px)}
     .bout{background:transparent;border:1.5px solid var(--br);color:var(--tm)}
@@ -153,49 +177,47 @@
     .tacc{background:var(--gl);color:var(--gm);border:1px solid var(--br)}
     .trej{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
 
-    /* ══ HOME PAGE ══ */
+    /* ══ HOME ══ */
     .wb{background:linear-gradient(135deg,var(--gm),var(--gd));border-radius:14px;padding:20px 22px;margin-bottom:18px;position:relative;overflow:hidden}
     .wb::before{content:'';position:absolute;top:-50px;right:60px;width:160px;height:160px;border-radius:50%;filter:blur(40px);background:rgba(0,255,136,.12)}
     .wb-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:white;font-size:.65rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:100px;margin-bottom:8px}
     .wb-pd{width:5px;height:5px;border-radius:50%;background:var(--gg);animation:pulse 2s infinite}
     .wb-t{font-family:'Clash Display',sans-serif;font-size:1.3rem;font-weight:700;color:white;letter-spacing:-.5px;margin-bottom:5px;line-height:1.2}
-    .wb-d{font-size:.8rem;color:rgba(255,255,255,.8);line-height:1.5;margin-bottom:14px}
+    .wb-d{font-size:.8rem;color:rgba(255,255,255,.8);line-height:1.5;margin-bottom:12px}
     .wb-btn{display:inline-flex;align-items:center;gap:7px;background:white;color:var(--gd);padding:9px 16px;border-radius:9px;font-family:'Clash Display',sans-serif;font-size:.82rem;font-weight:700;border:none;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.14);transition:all .2s}
-    .wb-btn:hover{transform:translateY(-2px)}
-    .h2c{display:grid;grid-template-columns:1fr 300px;gap:16px;margin-top:16px}
-    .pbb{background:var(--gl);border-radius:100px;height:6px;margin:9px 0 11px;overflow:hidden}
+    .pbb{background:var(--gl);border-radius:100px;height:6px;margin:8px 0 10px;overflow:hidden}
     .pbf{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--gb),var(--gm));transition:width 1.5s cubic-bezier(.22,1,.36,1)}
     .pr{display:flex;align-items:center;gap:8px;font-size:.77rem;margin-bottom:6px}
     .pk{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.58rem;flex-shrink:0}
     .pk-d{background:var(--gb);color:white}.pk-t{background:var(--gl);border:1.5px dashed var(--br)}
-    .skchips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+    .skchips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
     .skchip{padding:5px 12px;border-radius:100px;font-size:.77rem;font-weight:500;background:var(--gl);border:1px solid var(--br);color:var(--tm)}
-    .ai{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--br)}
-    .ai:last-child{border-bottom:none;padding-bottom:0}
-    .a-ico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0}
+    .ai_{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--br)}
+    .ai_:last-child{border-bottom:none;padding-bottom:0}
+    .a-ico{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.78rem;flex-shrink:0}
     .a-t{font-size:.8rem;font-weight:500;color:var(--td);margin-bottom:1px}
     .a-s{font-size:.68rem;color:var(--ts)}
     .a-amt{font-family:'Clash Display',sans-serif;font-size:.85rem;font-weight:700;color:var(--gm);margin-left:auto;flex-shrink:0}
 
     /* ══ PROJECTS ══ */
-    .fb{display:flex;align-items:center;gap:7px;margin-bottom:14px;flex-wrap:wrap}
-    .fbtn{padding:6px 12px;border-radius:100px;font-size:.77rem;font-weight:500;border:1.5px solid var(--br);background:var(--white);color:var(--ts);cursor:pointer;transition:all .2s;white-space:nowrap}
-    .fbtn:hover{border-color:var(--gb);color:var(--gm);background:var(--gp)}
+    .fb{display:flex;align-items:center;gap:7px;margin-bottom:14px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+    .fb::-webkit-scrollbar{display:none}
+    .fbtn{padding:6px 12px;border-radius:100px;font-size:.77rem;font-weight:500;border:1.5px solid var(--br);background:var(--white);color:var(--ts);cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}
     .fbtn.active{background:var(--gm);color:white;border-color:var(--gm)}
     .fbtn.aif{background:linear-gradient(135deg,var(--gm),var(--gd));color:white;border-color:var(--gm)}
     .pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
     .pc{background:var(--white);border:1px solid var(--br);border-radius:12px;padding:14px;transition:all .25s;cursor:pointer;display:flex;flex-direction:column;gap:9px;position:relative}
     .pc:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08);border-color:var(--gb)}
-    .pc.matched{border-color:var(--gb);background:linear-gradient(135deg,#f9fefb,var(--white))}
+    .pc.matched{border-color:var(--gb)}
     .match-bd{position:absolute;top:10px;right:10px;background:linear-gradient(135deg,var(--gm),var(--gd));color:white;font-size:.6rem;font-weight:700;padding:3px 8px;border-radius:100px}
-    .pt{display:flex;align-items:flex-start;gap:10px}
+    .pt_{display:flex;align-items:flex-start;gap:10px}
     .pi{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1rem;background:var(--gl);border:1px solid var(--br);flex-shrink:0}
     .pb_{font-size:.68rem;color:var(--ts);margin-bottom:2px}
     .pn{font-weight:600;font-size:.85rem;color:var(--td);line-height:1.3}
     .ptgs{display:flex;gap:5px;flex-wrap:wrap}
     .ptg{padding:2px 8px;background:var(--gp);border:1px solid var(--br);border-radius:100px;font-size:.65rem;font-weight:500;color:var(--tm)}
     .ptg.mt{background:var(--gl);color:var(--gm);border-color:var(--gb);font-weight:700}
-    .pf{display:flex;align-items:center;justify-content:space-between;padding-top:9px;border-top:1px solid var(--br)}
+    .pf_{display:flex;align-items:center;justify-content:space-between;padding-top:9px;border-top:1px solid var(--br)}
     .pp{font-family:'Clash Display',sans-serif;font-size:1rem;font-weight:700;color:var(--gm)}
     .pm{font-size:.68rem;color:var(--ts)}
     .pa{padding:6px 12px;background:var(--gp);border:1.5px solid var(--br);border-radius:7px;color:var(--gm);font-size:.77rem;font-weight:600;cursor:pointer;transition:all .2s}
@@ -203,41 +225,30 @@
 
     /* ══ APPLICATIONS ══ */
     .atabs{display:flex;gap:3px;background:var(--gp);border:1px solid var(--br);border-radius:10px;padding:3px;margin-bottom:14px;overflow-x:auto}
-    .atab{padding:7px 14px;border-radius:7px;font-size:.8rem;font-weight:500;color:var(--ts);cursor:pointer;transition:all .2s;border:none;background:transparent;white-space:nowrap}
+    .atab{padding:7px 14px;border-radius:7px;font-size:.81rem;font-weight:500;color:var(--ts);cursor:pointer;border:none;background:transparent;white-space:nowrap}
     .atab.active{background:white;color:var(--gd);font-weight:600;box-shadow:0 2px 7px rgba(0,0,0,.07)}
     .al{display:flex;flex-direction:column;gap:9px}
-    .ac{background:var(--white);border:1px solid var(--br);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:12px;transition:all .2s}
-    .ac:hover{border-color:var(--gb);box-shadow:0 3px 12px rgba(0,0,0,.06)}
-    .a-ic{width:38px;height:38px;border-radius:9px;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+    .ac{background:var(--white);border:1px solid var(--br);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:12px}
+    .ac:hover{border-color:var(--gb)}
+    .a-ic{width:38px;height:38px;border-radius:9px;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0}
     .a-in{flex:1;min-width:0}
     .a-ti{font-weight:600;font-size:.85rem;color:var(--td);margin-bottom:2px}
     .a-mt{font-size:.72rem;color:var(--ts);display:flex;gap:8px;flex-wrap:wrap}
     .a-ri{text-align:right;flex-shrink:0}
     .a-py{font-family:'Clash Display',sans-serif;font-size:.92rem;font-weight:700;color:var(--gm);display:block;margin-bottom:4px}
 
-    /* ══ PORTFOLIO ══ */
-    .pu{border:2px dashed var(--br);border-radius:12px;padding:24px;text-align:center;cursor:pointer;margin-bottom:16px;background:var(--gp);transition:all .25s}
-    .pu:hover{border-color:var(--gb);background:var(--gl)}
-    .pog{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
-    .poi{background:var(--white);border:1px solid var(--br);border-radius:10px;overflow:hidden;transition:all .25s;cursor:pointer}
-    .poi:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.08);border-color:var(--gb)}
-    .poth{height:110px;display:flex;align-items:center;justify-content:center;font-size:2rem}
-    .pob{padding:10px}
-    .pot{font-weight:600;font-size:.8rem;color:var(--td);margin-bottom:3px}
-    .potg{font-size:.67rem;color:var(--gm);font-weight:500}
-
     /* ══ EARNINGS ══ */
     .eh{background:linear-gradient(135deg,var(--gm),var(--gd));border-radius:14px;padding:22px;margin-bottom:16px;position:relative;overflow:hidden}
     .eh::before{content:'';position:absolute;top:-30px;right:-30px;width:130px;height:130px;background:rgba(255,255,255,.07);border-radius:50%}
     .eh-l{position:relative;z-index:2}
-    .eh-lb{font-size:.7rem;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
+    .eh-lb{font-size:.7rem;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
     .eh-a{font-family:'Clash Display',sans-serif;font-size:2.2rem;font-weight:700;color:white;letter-spacing:-1px}
     .eh-s{font-size:.76rem;color:rgba(255,255,255,.7);margin-top:5px;margin-bottom:14px}
     .eh-stats{display:flex;gap:10px;margin-top:14px}
     .es{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:10px 14px;text-align:center;flex:1}
     .es-n{font-family:'Clash Display',sans-serif;font-size:1.1rem;font-weight:700;color:white}
     .es-l{font-size:.67rem;color:rgba(255,255,255,.7);margin-top:1px}
-    .er{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--br)}
+    .er{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--br)}
     .er:last-child{border-bottom:none}
     .er-i{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
     .er-in{flex:1;min-width:0}
@@ -246,10 +257,10 @@
     .er-a{font-family:'Clash Display',sans-serif;font-size:.9rem;font-weight:700}
 
     /* ══ COURSES ══ */
-    .ch{background:var(--gl);border:1px solid var(--br);border-radius:13px;padding:18px 20px;margin-bottom:16px;display:flex;align-items:center;gap:15px;flex-wrap:wrap}
-    .cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:11px}
+    .ch{background:var(--gl);border:1px solid var(--br);border-radius:13px;padding:18px;margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+    .cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:11px}
     .cc{background:var(--white);border:1px solid var(--br);border-radius:11px;overflow:hidden;transition:all .25s;cursor:pointer}
-    .cc:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.08);border-color:var(--gb)}
+    .cc:hover{transform:translateY(-2px);border-color:var(--gb)}
     .cth{height:90px;display:flex;align-items:center;justify-content:center;font-size:2rem;position:relative}
     .cm{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.9);border-radius:100px;padding:2px 8px;font-size:.62rem;font-weight:700;color:var(--gm)}
     .cb{padding:11px}
@@ -263,24 +274,24 @@
     /* ══ MENTORS ══ */
     .mg{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:11px}
     .mc{background:var(--white);border:1px solid var(--br);border-radius:12px;padding:16px;text-align:center;transition:all .25s}
-    .mc:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.08);border-color:var(--gb)}
+    .mc:hover{transform:translateY(-2px);border-color:var(--gb)}
     .mav{width:54px;height:54px;border-radius:50%;margin:0 auto 10px;background:linear-gradient(135deg,var(--gb),var(--gd));display:flex;align-items:center;justify-content:center;font-family:'Clash Display',sans-serif;font-size:1.1rem;font-weight:700;color:white}
     .mn{font-family:'Clash Display',sans-serif;font-size:.9rem;font-weight:700;margin-bottom:2px}
     .mr_{font-size:.73rem;color:var(--ts);margin-bottom:8px}
-    .mtgs{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-bottom:11px}
+    .mtgs{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-bottom:10px}
     .mtg{padding:2px 8px;background:var(--gp);border:1px solid var(--br);border-radius:100px;font-size:.64rem;color:var(--tm)}
-    .mst{display:flex;justify-content:center;gap:18px;margin-bottom:11px}
-    .msn{font-family:'Clash Display',sans-serif;font-size:1rem;font-weight:700;color:var(--td)}
+    .mst{display:flex;justify-content:center;gap:16px;margin-bottom:10px}
+    .msn{font-family:'Clash Display',sans-serif;font-size:.95rem;font-weight:700;color:var(--td)}
     .msl{font-size:.62rem;color:var(--ts)}
     .bb{width:100%;padding:8px;background:var(--gp);border:1.5px solid var(--br);border-radius:8px;color:var(--gm);font-family:'Outfit',sans-serif;font-size:.79rem;font-weight:600;cursor:pointer;transition:all .2s}
-    .bb:hover{background:var(--gm);color:white;border-color:var(--gm)}
+    .bb:hover{background:var(--gm);color:white}
 
     /* ══ PROFILE ══ */
-    .pl{display:grid;grid-template-columns:240px 1fr;gap:15px}
+    .pl{display:grid;grid-template-columns:240px 1fr;gap:14px}
     .pcl{background:var(--white);border:1px solid var(--br);border-radius:13px;padding:20px;text-align:center}
     .pav{width:68px;height:68px;border-radius:50%;margin:0 auto 12px;background:linear-gradient(135deg,var(--gb),var(--gd));display:flex;align-items:center;justify-content:center;font-family:'Clash Display',sans-serif;font-size:1.5rem;font-weight:700;color:white}
     .pnm{font-family:'Clash Display',sans-serif;font-size:1.05rem;font-weight:700;margin-bottom:3px}
-    .pco{font-size:.78rem;color:var(--ts);margin-bottom:11px}
+    .pco{font-size:.78rem;color:var(--ts);margin-bottom:10px}
     .psk{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-bottom:14px}
     .psk span{padding:3px 10px;background:var(--gl);border:1px solid var(--br);border-radius:100px;font-size:.69rem;font-weight:500;color:var(--tm)}
     .fg{margin-bottom:13px}
@@ -295,14 +306,14 @@
     .sk-opt.sel{background:var(--gm);color:white;border-color:var(--gm)}
 
     /* ══ GETTING STARTED ══ */
-    .gs-card{background:var(--gp);border:1.5px dashed var(--br);border-radius:13px;padding:20px;margin-bottom:14px}
-    .gs-card h3{font-family:'Clash Display',sans-serif;font-size:.95rem;font-weight:700;margin-bottom:12px}
-    .gs-step{display:flex;align-items:center;gap:11px;margin-bottom:9px;padding:10px 13px;background:white;border:1px solid var(--br);border-radius:9px;cursor:pointer;transition:all .2s}
+    .gs-card{background:var(--gp);border:1.5px dashed var(--br);border-radius:12px;padding:18px;margin-bottom:14px}
+    .gs-card h3{font-family:'Clash Display',sans-serif;font-size:.93rem;font-weight:700;margin-bottom:11px}
+    .gs-step{display:flex;align-items:center;gap:10px;margin-bottom:8px;padding:9px 12px;background:white;border:1px solid var(--br);border-radius:9px;cursor:pointer;transition:all .2s}
     .gs-step:hover{border-color:var(--gb)}
-    .gs-num{width:24px;height:24px;border-radius:50%;background:var(--gm);color:white;font-family:'Clash Display',sans-serif;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .gs-num{width:23px;height:23px;border-radius:50%;background:var(--gm);color:white;font-family:'Clash Display',sans-serif;font-size:.74rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
     .gs-num.done{background:var(--gb)}
-    .gs-txt strong{display:block;font-size:.83rem;font-weight:600;color:var(--td);margin-bottom:1px}
-    .gs-txt span{font-size:.73rem;color:var(--ts)}
+    .gs-txt strong{display:block;font-size:.82rem;font-weight:600;color:var(--td);margin-bottom:1px}
+    .gs-txt span{font-size:.72rem;color:var(--ts)}
 
     /* ══ EMPTY STATE ══ */
     .empty-s{text-align:center;padding:36px 20px;color:var(--ts)}
@@ -311,179 +322,35 @@
     .empty-s p{font-size:.8rem;margin-bottom:14px}
 
     /* ══ MOBILE BOTTOM NAV ══ */
-    /* ✅ MOBILE FIX 8: Bottom navigation bar for mobile */
-    .bottom-nav{
-      display:none;
-      position:fixed;
-      bottom:0;left:0;right:0;
-      background:var(--white);
-      border-top:1px solid var(--br);
-      padding:8px 0;
-      padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
-      z-index:200;
-      grid-template-columns:repeat(5,1fr);
-    }
-    .bn-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px;transition:all .2s;border:none;background:transparent;width:100%}
-    .bn-item.active .bn-icon{color:var(--gm)}
-    .bn-item.active .bn-label{color:var(--gm);font-weight:600}
-    .bn-icon{color:var(--ts);transition:color .2s;display:flex;align-items:center;justify-content:center}
-    .bn-label{font-size:.6rem;color:var(--ts);font-family:'Outfit',sans-serif;font-weight:500}
+    .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--br);padding:6px 0;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px));z-index:300;grid-template-columns:repeat(5,1fr)}
+    .bn-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 2px;border:none;background:transparent;width:100%}
+    .bn-item svg{stroke:var(--ts);transition:stroke .2s}
+    .bn-item span{font-size:.58rem;color:var(--ts);font-family:'Outfit',sans-serif;font-weight:500;transition:color .2s}
+    .bn-item.active svg{stroke:var(--gm)}
+    .bn-item.active span{color:var(--gm);font-weight:700}
 
-    /* OVERLAY for mobile sidebar */
-    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:90}
+    /* ══ OVERLAY ══ */
+    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400}
     .overlay.show{display:block}
 
-    /* SPIN */
+    /* ══ MISC ══ */
     .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:white;border-radius:50%;animation:sp .6s linear infinite;vertical-align:middle;margin-right:5px}
     @keyframes sp{to{transform:rotate(360deg)}}
-
-    /* TOAST */
-    .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(80px);padding:11px 20px;border-radius:100px;font-size:.83rem;font-weight:500;z-index:999;opacity:0;white-space:nowrap;transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .3s;max-width:90vw}
+    .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);padding:11px 20px;border-radius:100px;font-size:.83rem;font-weight:500;z-index:9999;opacity:0;white-space:nowrap;transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .3s;max-width:90vw}
     .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
     .toast.success{background:var(--gd);color:white}
     .toast.error{background:#dc2626;color:white}
     .toast.info{background:var(--td);color:white}
-
-    /* ✅ MOBILE FIX 9: Scrollbar styling */
     .content::-webkit-scrollbar{width:3px}
     .content::-webkit-scrollbar-thumb{background:var(--br);border-radius:100px}
     .nav::-webkit-scrollbar{width:3px}
     .nav::-webkit-scrollbar-thumb{background:var(--br);border-radius:100px}
-
-    /* ════════════════════════════════
-       ✅ MOBILE RESPONSIVE STYLES
-       Yahan sab mobile fixes hain
-    ════════════════════════════════ */
-    @media (max-width: 768px) {
-
-      /* ✅ Desktop fixed height hata do mobile pe */
-      .app {
-        height: auto;
-        min-height: 100vh;
-        flex-direction: column;
-      }
-
-      /* ✅ Sidebar mobile pe slide-in hoga left se */
-      .sidebar {
-        position: fixed;
-        left: 0; top: 0; bottom: 0;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-        z-index: 100;
-        width: 280px;
-      }
-      .sidebar.open {
-        transform: translateX(0);
-        box-shadow: 4px 0 20px rgba(0,0,0,.15);
-      }
-
-      /* ✅ Main area full width */
-      .main {
-        width: 100%;
-        overflow: visible; /* mobile pe scroll hoga */
-      }
-
-      /* ✅ Topbar sticky top pe */
-      .topbar {
-        position: sticky;
-        top: 0;
-        z-index: 50;
-        padding: 0 16px;
-        height: 54px;
-      }
-
-      /* ✅ Desktop search bar hide karo */
-      .sw-bar { display: none; }
-
-      /* ✅ Hamburger button dikhao */
-      .mb { display: flex; }
-
-      /* ✅ Content scroll kare freely */
-      .content {
-        overflow: visible;
-        flex: none;
-        min-height: calc(100vh - 54px - 65px); /* topbar + bottom nav */
-      }
-
-      /* ✅ Page padding mobile ke liye */
-      .page {
-        padding: 16px 14px 90px; /* bottom 90px = bottom nav space */
-      }
-
-      /* ✅ Stats 2x2 grid mobile pe */
-      .g4 { grid-template-columns: 1fr 1fr; }
-
-      /* ✅ 2 column grids mobile pe 1 column */
-      .g2 { grid-template-columns: 1fr; }
-      .h2c { grid-template-columns: 1fr; }
-      .pl { grid-template-columns: 1fr; }
-
-      /* ✅ Earnings hero mobile */
-      .eh-stats { flex-direction: row; }
-      .es { flex: 1; }
-
-      /* ✅ Welcome banner mobile */
-      .wb { padding: 18px; }
-      .wb-t { font-size: 1.15rem; }
-
-      /* ✅ Bottom nav show karo */
-      .bottom-nav { display: grid; }
-
-      /* ✅ Toast mobile pe upar */
-      .toast { bottom: 75px; }
-
-      /* ✅ Project grid mobile */
-      .pg { grid-template-columns: 1fr; }
-
-      /* ✅ Filter buttons scroll kare */
-      .fb {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        padding-bottom: 4px;
-        -webkit-overflow-scrolling: touch;
-      }
-      .fb::-webkit-scrollbar { display: none; }
-
-      /* ✅ Application cards mobile */
-      .a-mt { flex-direction: column; gap: 2px; }
-
-      /* ✅ Headings smaller */
-      .ph h2 { font-size: 1.25rem; }
-
-      /* ✅ Courses grid */
-      .cg { grid-template-columns: 1fr 1fr; }
-
-      /* ✅ Mentor grid */
-      .mg { grid-template-columns: 1fr 1fr; }
-
-      /* ✅ Portfolio grid */
-      .pog { grid-template-columns: 1fr 1fr; }
-
-      /* ✅ Profile page */
-      .pcl { display: flex; flex-direction: row; align-items: center; gap: 16px; text-align: left; }
-      .psk { justify-content: flex-start; }
-    }
-
-    /* ✅ Very small phones */
-    @media (max-width: 380px) {
-      .g4 { grid-template-columns: 1fr 1fr; gap: 8px; }
-      .cg { grid-template-columns: 1fr; }
-      .mg { grid-template-columns: 1fr; }
-      .page { padding: 14px 12px 90px; }
-    }
-
-    /* ✅ iPad / Tablet */
-    @media (min-width: 769px) and (max-width: 1024px) {
-      :root { --sw: 220px; }
-      .h2c { grid-template-columns: 1fr 260px; }
-      .g4 { grid-template-columns: repeat(2, 1fr); }
-    }
   </style>
 </head>
 <body>
 <div class="app">
 
-<!-- OVERLAY (mobile sidebar ke peeche) -->
+<!-- DARK OVERLAY (mobile sidebar ke peeche) -->
 <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
 <!-- ══ SIDEBAR ══ -->
@@ -499,7 +366,7 @@
   <nav class="nav">
     <div class="nl">Main</div>
     <button class="ni active" onclick="goTo('home',this)"><span class="nicon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>Dashboard</button>
-    <button class="ni" onclick="goTo('projects',this)"><span class="nicon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></span>Browse Projects<span class="nb" id="projBadge">12</span></button>
+    <button class="ni" onclick="goTo('projects',this)"><span class="nicon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></span>Browse Projects<span class="nb">12</span></button>
     <button class="ni" onclick="goTo('applications',this)"><span class="nicon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></span>My Applications<span class="nb" id="appsBadge">0</span></button>
     <button class="ni" onclick="goTo('portfolio',this)"><span class="nicon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg></span>My Portfolio</button>
     <button class="ni" onclick="goTo('earnings',this)"><span class="nicon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>Earnings</button>
@@ -523,9 +390,9 @@
 <div class="main">
   <header class="topbar">
     <div class="tl">
-      <!-- ✅ Hamburger button - mobile pe dikhega -->
+      <!-- Hamburger — mobile only -->
       <button class="mb" onclick="openSidebar()">
-        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
       <div>
         <div class="tt" id="pgT">Dashboard</div>
@@ -533,20 +400,12 @@
       </div>
     </div>
     <div class="tr">
-      <!-- Desktop search -->
-      <div class="sw-bar">
-        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
-        <input type="text" placeholder="Search projects..."/>
-      </div>
-      <div class="ib">
-        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-        <span class="nd"></span>
-      </div>
+      <div class="sw-bar"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg><input type="text" placeholder="Search projects..."/></div>
+      <div class="ib"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><span class="nd"></span></div>
       <div class="tav" id="tbAv">?</div>
     </div>
   </header>
 
-  <!-- ══ CONTENT ══ -->
   <div class="content" id="mc">
 
     <!-- HOME -->
@@ -562,49 +421,35 @@
           </button>
         </div>
       </div>
-
-      <!-- STATS - Real data from DB -->
       <div class="g4" style="margin-bottom:16px">
         <div class="sc"><div class="sic ig">💰</div><span class="sn" id="statEarned">₹0</span><div class="sl">Total Earned</div><div class="sc- empty" id="statEarnedSub">Start applying</div></div>
-        <div class="sc"><div class="sic it">✅</div><span class="sn" id="statProjects">0</span><div class="sl">Projects Done</div><div class="sc- empty" id="statProjectsSub">Complete first project</div></div>
+        <div class="sc"><div class="sic it">✅</div><span class="sn" id="statProjects">0</span><div class="sl">Projects Done</div><div class="sc- empty" id="statProjectsSub">Complete first</div></div>
         <div class="sc"><div class="sic ib2">📋</div><span class="sn" id="statApps">0</span><div class="sl">Applications</div><div class="sc- empty" id="statAppsSub">Apply below</div></div>
         <div class="sc"><div class="sic ia">⭐</div><span class="sn" id="statRating">—</span><div class="sl">Avg Rating</div><div class="sc- empty">After first project</div></div>
       </div>
-
-      <!-- SKILLS -->
       <div class="card" style="margin-bottom:14px">
         <div class="st">🎯 Your Skills<span class="sa" onclick="goTo('profile',null)">Edit →</span></div>
-        <div class="skchips" id="homeSkills">
-          <span style="color:var(--ts);font-size:.82rem">No skills yet. <a href="#" onclick="goTo('profile',null);return false" style="color:var(--gm);font-weight:600">Add skills →</a></span>
-        </div>
+        <div class="skchips" id="homeSkills"><span style="color:var(--ts);font-size:.82rem">No skills yet. <a href="#" onclick="goTo('profile',null);return false" style="color:var(--gm);font-weight:600">Add skills →</a></span></div>
       </div>
-
       <div class="h2c">
         <div>
-          <!-- Getting Started (new users ke liye) -->
           <div class="gs-card" id="gettingStarted">
             <h3>🚀 4 Steps to Your First Project</h3>
             <div class="gs-step" onclick="goTo('profile',null)"><div class="gs-num done">✓</div><div class="gs-txt"><strong>Account Created ✅</strong><span>You're registered!</span></div></div>
-            <div class="gs-step" id="gsSkillStep" onclick="goTo('profile',null)"><div class="gs-num" id="gsSkillNum">2</div><div class="gs-txt"><strong>Add Your Skills</strong><span>Tell brands what you can do</span></div></div>
-            <div class="gs-step" onclick="goTo('projects',null)"><div class="gs-num">3</div><div class="gs-txt"><strong>Apply to Projects</strong><span>Browse and apply — it's free</span></div></div>
+            <div class="gs-step" onclick="goTo('profile',null)"><div class="gs-num" id="gsSkillNum">2</div><div class="gs-txt"><strong>Add Your Skills</strong><span>Tell brands what you can do</span></div></div>
+            <div class="gs-step" onclick="goTo('projects',null)"><div class="gs-num">3</div><div class="gs-txt"><strong>Apply to Projects</strong><span>Browse and apply — free!</span></div></div>
             <div class="gs-step" onclick="goTo('portfolio',null)"><div class="gs-num">4</div><div class="gs-txt"><strong>Upload Portfolio</strong><span>Show brands your work</span></div></div>
           </div>
-
-          <!-- Matched Jobs (skills add hone ke baad) -->
           <div class="card" id="matchedJobsCard" style="display:none">
             <div class="st">🔥 Matched Projects<span class="sa" onclick="goTo('projects',null)">See all →</span></div>
             <div id="homeMatchedJobs"><div style="color:var(--ts);font-size:.82rem;padding:8px 0">Loading matches...</div></div>
           </div>
-
-          <!-- Recent Applications -->
           <div class="card" id="recentAppsCard" style="display:none;margin-top:12px">
             <div class="st">📋 Recent Applications<span class="sa" onclick="goTo('applications',null)">See all →</span></div>
             <div id="homeRecentApps"></div>
           </div>
         </div>
-
         <div>
-          <!-- Profile Strength -->
           <div class="card" style="margin-bottom:12px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
               <div class="st" style="margin:0">Profile Strength</div>
@@ -614,10 +459,8 @@
             <div class="pr"><div class="pk pk-d">✓</div><span style="color:var(--ts);font-size:.76rem;text-decoration:line-through">Account created</span></div>
             <div class="pr" id="pcSkillRow"><div class="pk pk-t"></div><span style="color:var(--gm);font-size:.76rem;font-weight:500;cursor:pointer" onclick="goTo('profile',null)">→ Add your skills</span></div>
             <div class="pr" id="pcCollegeRow"><div class="pk pk-t"></div><span style="color:var(--gm);font-size:.76rem;font-weight:500;cursor:pointer" onclick="goTo('profile',null)">→ Add college name</span></div>
-            <div class="pr"><div class="pk pk-t"></div><span style="color:var(--gm);font-size:.76rem;font-weight:500;cursor:pointer" onclick="goTo('portfolio',null)">→ Upload portfolio work</span></div>
+            <div class="pr"><div class="pk pk-t"></div><span style="color:var(--gm);font-size:.76rem;font-weight:500;cursor:pointer" onclick="goTo('portfolio',null)">→ Upload portfolio</span></div>
           </div>
-
-          <!-- Activity -->
           <div class="card">
             <div class="st">Recent Activity</div>
             <div id="activityFeed">
@@ -636,13 +479,11 @@
     <!-- BROWSE PROJECTS -->
     <div class="page" id="page-projects">
       <div class="ph"><h2>Browse Projects 🔍</h2><p>Real brand projects matched to your skills.</p></div>
-      <!-- AI Banner -->
-      <div id="aiBanner" style="display:none;background:linear-gradient(135deg,#f0fdf6,#dcfce7);border:1.5px solid var(--br);border-radius:11px;padding:13px 16px;margin-bottom:14px;display:none;align-items:center;gap:12px">
-        <div style="font-size:1.6rem;flex-shrink:0">🤖</div>
-        <div style="flex:1"><h4 style="font-family:'Clash Display',sans-serif;font-size:.87rem;font-weight:700;color:var(--td);margin-bottom:2px">AI Matching Active</h4><p style="font-size:.76rem;color:var(--ts)" id="aiText">Showing jobs matched to your skills.</p></div>
-        <div style="background:var(--gm);color:white;padding:4px 11px;border-radius:100px;font-size:.72rem;font-weight:700;white-space:nowrap;flex-shrink:0" id="aiBadge">0 Matches</div>
+      <div id="aiBanner" style="display:none;background:linear-gradient(135deg,#f0fdf6,#dcfce7);border:1.5px solid var(--br);border-radius:11px;padding:12px 16px;margin-bottom:14px;align-items:center;gap:12px">
+        <div style="font-size:1.5rem;flex-shrink:0">🤖</div>
+        <div style="flex:1"><h4 style="font-family:'Clash Display',sans-serif;font-size:.86rem;font-weight:700;color:var(--td);margin-bottom:2px">AI Matching Active</h4><p style="font-size:.75rem;color:var(--ts)" id="aiText">Showing jobs matched to your skills.</p></div>
+        <div style="background:var(--gm);color:white;padding:4px 11px;border-radius:100px;font-size:.71rem;font-weight:700;white-space:nowrap;flex-shrink:0" id="aiBadge">0 Matches</div>
       </div>
-      <!-- Filter buttons - horizontally scrollable on mobile -->
       <div class="fb">
         <button class="fbtn aif active" id="aiBtn" onclick="setFilter('ai',this)">✨ My Skills</button>
         <button class="fbtn" onclick="setFilter('all',this)">All</button>
@@ -669,16 +510,12 @@
     <!-- PORTFOLIO -->
     <div class="page" id="page-portfolio">
       <div class="ph"><h2>My Portfolio 📂</h2><p>Showcase work to attract brands.</p></div>
-      <div class="pu" onclick="showToast('Upload coming soon! 🗄️','info')">
+      <div style="border:2px dashed var(--br);border-radius:12px;padding:24px;text-align:center;cursor:pointer;margin-bottom:16px;background:var(--gp)" onclick="showToast('Upload coming soon!','info')">
         <div style="font-size:1.8rem;margin-bottom:7px">☁️</div>
-        <h4 style="font-family:'Clash Display',sans-serif;font-size:.95rem;font-weight:700;margin-bottom:3px">Upload Your Work</h4>
+        <h4 style="font-family:'Clash Display',sans-serif;font-size:.93rem;font-weight:700;margin-bottom:3px">Upload Your Work</h4>
         <p style="font-size:.78rem;color:var(--ts)">Images, videos, PDFs supported.</p>
       </div>
-      <div class="empty-s" id="portfolioEmpty">
-        <div class="ei">📁</div>
-        <h3>No portfolio work yet</h3>
-        <p>Upload your best work — designs, videos, articles.</p>
-      </div>
+      <div class="empty-s"><div class="ei">📁</div><h3>No portfolio work yet</h3><p>Upload your best work — designs, videos, articles.</p></div>
     </div>
 
     <!-- EARNINGS -->
@@ -697,28 +534,14 @@
       </div>
       <div class="card">
         <div class="st" style="margin-bottom:12px">Transaction History</div>
-        <div id="txList">
-          <div class="empty-s" style="padding:22px 10px">
-            <div class="ei">💸</div>
-            <h3>No transactions yet</h3>
-            <p>Complete your first project to see payments here.</p>
-            <button class="btn bpri" style="font-size:.79rem" onclick="goTo('projects',null)">Find Projects →</button>
-          </div>
-        </div>
+        <div id="txList"><div class="empty-s" style="padding:22px 10px"><div class="ei">💸</div><h3>No transactions yet</h3><p>Complete your first project!</p><button class="btn bpri" style="font-size:.79rem" onclick="goTo('projects',null)">Find Projects →</button></div></div>
       </div>
     </div>
 
     <!-- COURSES -->
     <div class="page" id="page-courses">
       <div class="ph"><h2>Skill Courses 🎓</h2><p>Learn, improve, and land better projects.</p></div>
-      <div class="ch">
-        <div style="font-size:2rem;flex-shrink:0">🚀</div>
-        <div style="flex:1">
-          <h3 style="font-family:'Clash Display',sans-serif;font-size:1rem;font-weight:700;margin-bottom:4px">EdTech Coming Soon!</h3>
-          <p style="font-size:.8rem;color:var(--ts);line-height:1.5;margin-bottom:10px">Courses in Video Editing, Graphic Design & more.</p>
-          <button class="btn bpri" style="font-size:.8rem" onclick="showToast('You are on early access list! 🎉','success')">Notify Me</button>
-        </div>
-      </div>
+      <div class="ch"><div style="font-size:2rem;flex-shrink:0">🚀</div><div style="flex:1"><h3 style="font-family:'Clash Display',sans-serif;font-size:1rem;font-weight:700;margin-bottom:4px">EdTech Coming Soon!</h3><p style="font-size:.8rem;color:var(--ts);line-height:1.5;margin-bottom:10px">Courses in Video Editing, Graphic Design & more.</p><button class="btn bpri" style="font-size:.8rem" onclick="showToast('You are on early access list! 🎉','success')">Notify Me</button></div></div>
       <div class="cg">
         <div class="cc" onclick="showToast('Course in progress!','info')"><div class="cth" style="background:linear-gradient(135deg,#e8fdf2,#a7f3d0)">🎬<span class="cm">Free</span></div><div class="cb"><div class="ct">Video Editing with CapCut</div><div class="c-m"><span>4 lessons · 2hrs</span><span class="cf">Free</span></div><div class="cpb"><div class="cpf" style="width:60%"></div></div></div></div>
         <div class="cc" onclick="showToast('Coming soon!','info')"><div class="cth" style="background:linear-gradient(135deg,#fef9c3,#fde68a)">🎨<span class="cm">Soon</span></div><div class="cb"><div class="ct">Graphic Design with Canva</div><div class="c-m"><span>8 lessons · 4hrs</span><span class="cp_">₹499</span></div></div></div>
@@ -799,69 +622,66 @@
 
   </div><!-- /content -->
 
-  <!-- ✅ MOBILE BOTTOM NAVIGATION BAR -->
+  <!-- MOBILE BOTTOM NAV -->
   <nav class="bottom-nav" id="bottomNav">
     <button class="bn-item active" id="bn-home" onclick="goTo('home',null);setBottomNav('home')">
-      <span class="bn-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
-      <span class="bn-label">Home</span>
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Home</span>
     </button>
     <button class="bn-item" id="bn-projects" onclick="goTo('projects',null);setBottomNav('projects')">
-      <span class="bn-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></span>
-      <span class="bn-label">Projects</span>
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      <span>Projects</span>
     </button>
     <button class="bn-item" id="bn-applications" onclick="goTo('applications',null);setBottomNav('applications')">
-      <span class="bn-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></span>
-      <span class="bn-label">Applied</span>
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      <span>Applied</span>
     </button>
     <button class="bn-item" id="bn-earnings" onclick="goTo('earnings',null);setBottomNav('earnings')">
-      <span class="bn-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>
-      <span class="bn-label">Earnings</span>
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <span>Earnings</span>
     </button>
     <button class="bn-item" id="bn-profile" onclick="goTo('profile',null);setBottomNav('profile')">
-      <span class="bn-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></span>
-      <span class="bn-label">Profile</span>
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+      <span>Profile</span>
     </button>
   </nav>
-
-</div><!-- /main -->
-</div><!-- /app -->
+</div>
+</div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ════ AUTH GUARD ════
+// AUTH GUARD
 const _tk=localStorage.getItem('ngg_token');
 const _u=JSON.parse(localStorage.getItem('ngg_user')||'null');
 if(!_tk||!_u){window.location.href='/login';}
 if(_u&&_u.role&&_u.role!=='student'){window.location.href='/login';}
 
-// ════ ALL JOBS ════
+// JOBS DATA
 const ALL_JOBS=[
   {id:1,ico:'🛍️',brand:'StyleCo India',title:'Instagram Reels Editor',cat:'video',tags:['Video Editing','Reels','Instagram'],pay:'₹2,500',days:'3-5 days',badge:'hot'},
   {id:2,ico:'🍕',brand:'FoodieBox',title:'Social Media Post Pack (20)',cat:'design',tags:['Graphic Design','Canva','Social Media'],pay:'₹1,800',days:'2 days',badge:'new'},
-  {id:3,ico:'💻',brand:'LearnFast EdTech',title:'5 SEO Blog Articles',cat:'writing',tags:['Content Writing','SEO','Blogging'],pay:'₹3,000',days:'1 week',badge:'apply'},
+  {id:3,ico:'💻',brand:'LearnFast EdTech',title:'5 SEO Blog Articles',cat:'writing',tags:['Content Writing','SEO'],pay:'₹3,000',days:'1 week',badge:'apply'},
   {id:4,ico:'🎵',brand:'BeatDrop Music',title:'YouTube Shorts Package (3)',cat:'video',tags:['Video Editing','YouTube','Shorts'],pay:'₹2,200',days:'4 days',badge:'new'},
   {id:5,ico:'🏋️',brand:'FitLife Brand',title:'Landing Page Design',cat:'web',tags:['Web Development','HTML','CSS'],pay:'₹4,500',days:'1 week',badge:'hot'},
   {id:6,ico:'📸',brand:'PhotoCraft',title:'Instagram Carousel Posts (10)',cat:'design',tags:['Graphic Design','Instagram'],pay:'₹1,500',days:'3 days',badge:'new'},
   {id:7,ico:'🎮',brand:'GameZone',title:'Twitter/X Content Calendar',cat:'writing',tags:['Content Writing','Social Media'],pay:'₹2,000',days:'5 days',badge:'apply'},
   {id:8,ico:'🌿',brand:'GreenEarth NGO',title:'Website Redesign (WordPress)',cat:'web',tags:['Web Development','WordPress'],pay:'₹6,000',days:'2 weeks',badge:'hot'},
-  {id:9,ico:'💄',brand:'GlowUp Beauty',title:'TikTok Reel Editing (5 vids)',cat:'video',tags:['Video Editing','TikTok','Reels'],pay:'₹3,200',days:'4 days',badge:'new'},
+  {id:9,ico:'💄',brand:'GlowUp Beauty',title:'TikTok Reel Editing (5 vids)',cat:'video',tags:['Video Editing','TikTok'],pay:'₹3,200',days:'4 days',badge:'new'},
   {id:10,ico:'📚',brand:'StudyPro',title:'Email Newsletter Copy',cat:'writing',tags:['Content Writing','Copywriting'],pay:'₹1,600',days:'3 days',badge:'apply'},
   {id:11,ico:'🚗',brand:'DriveNow',title:'Logo & Brand Identity Pack',cat:'design',tags:['Graphic Design','Logo','Branding'],pay:'₹3,800',days:'5 days',badge:'hot'},
   {id:12,ico:'☕',brand:'BrewCo Café',title:'Product Photography Editing',cat:'design',tags:['Photography','Photo Editing'],pay:'₹1,200',days:'2 days',badge:'new'},
 ];
 
-// ════ STATE ════
 let curFilter='ai',curCat='all',curSearch='';
-let aiJobs=[],realApps=[],userSkills=[],realStats={totalEarned:0,projectsDone:0,activeApps:0,pending:0};
+let aiJobs=[],realApps=[],userSkills=[];
 
-// ════ AI MATCHING ════
-const SKILL_KW={'Video Editing':['video','editing','reel','reels','tiktok','youtube','shorts','footage','capcut'],'Graphic Design':['design','graphic','logo','canva','brand','branding','visual','figma','banner','carousel'],'Web Development':['web','website','html','css','wordpress','landing','page','frontend','react'],'Content Writing':['content','writing','blog','article','seo','copy','copywriting','newsletter','email'],'Social Media':['social','instagram','twitter','linkedin','facebook','media','post'],'Photography':['photo','photography','lightroom','product','image'],'Audio':['audio','music','sound','podcast'],'Data & Excel':['data','excel','spreadsheet','analytics'],'AI Tools':['ai','artificial','chatgpt','automation']};
+// AI MATCHING
+const SKILL_KW={'Video Editing':['video','editing','reel','reels','tiktok','youtube','shorts','capcut'],'Graphic Design':['design','graphic','logo','canva','brand','branding','visual','figma','banner'],'Web Development':['web','website','html','css','wordpress','landing','page','frontend'],'Content Writing':['content','writing','blog','article','seo','copy','copywriting','newsletter'],'Social Media':['social','instagram','twitter','linkedin','media','post'],'Photography':['photo','photography','lightroom','product'],'Audio':['audio','music','sound','podcast'],'Data & Excel':['data','excel','spreadsheet'],'AI Tools':['ai','chatgpt','automation']};
 
 function matchJobs(skills,jobs){
   if(!skills||!skills.length)return jobs.map(j=>({...j,matchScore:0,isMatch:false,matchedTags:[]}));
-  const kws=new Set();
-  skills.forEach(sk=>(SKILL_KW[sk]||[]).forEach(k=>kws.add(k)));
+  const kws=new Set();skills.forEach(sk=>(SKILL_KW[sk]||[]).forEach(k=>kws.add(k)));
   return jobs.map(j=>{
     const txt=[j.title,j.brand,...(j.tags||[])].join(' ').toLowerCase();
     let score=0;const mt=[];
@@ -871,57 +691,53 @@ function matchJobs(skills,jobs){
   }).sort((a,b)=>b.matchScore-a.matchScore);
 }
 
-// ════ LOAD STATS FROM SERVER ════
+// LOAD STATS FROM SERVER
 async function loadStats(){
   try{
     const res=await fetch('/api/student/stats',{headers:{'Authorization':'Bearer '+_tk}});
     const data=await res.json();
     if(!data.success)return;
-    realStats=data.stats;
-    realApps=data.applications||[];
-    const earned=realStats.totalEarned||0;
-    const projects=realStats.projectsDone||0;
-    const apps=realStats.activeApps||0;
-    const pending=realStats.pending||0;
-    // Update stats
+    const earned=data.stats.totalEarned||0;
+    const projects=data.stats.projectsDone||0;
+    const apps=data.stats.activeApps||0;
+    const pending=data.stats.pending||0;
     document.getElementById('statEarned').textContent=earned>0?'₹'+earned.toLocaleString('en-IN'):'₹0';
     document.getElementById('statProjects').textContent=projects;
     document.getElementById('statApps').textContent=apps;
     if(earned>0){document.getElementById('statEarnedSub').textContent='↑ Keep going!';document.getElementById('statEarnedSub').classList.remove('empty');}
-    if(projects>0){document.getElementById('statProjectsSub').textContent='↑ Great work!';document.getElementById('statProjectsSub').classList.remove('empty');}
+    if(projects>0){document.getElementById('statProjectsSub').textContent='↑ Great!';document.getElementById('statProjectsSub').classList.remove('empty');}
     if(apps>0){document.getElementById('statAppsSub').textContent='→ '+apps+' under review';document.getElementById('statAppsSub').classList.remove('empty');document.getElementById('appsBadge').textContent=apps;}
     document.getElementById('earnTotal').textContent='₹'+earned.toLocaleString('en-IN');
     document.getElementById('earnProjects').textContent=projects;
     document.getElementById('earnPending').textContent='₹'+pending.toLocaleString('en-IN');
     document.getElementById('pStatProj').textContent=projects;
     document.getElementById('pStatEarn').textContent='₹'+earned.toLocaleString('en-IN');
-    if(data.transactions&&data.transactions.length>0)renderTransactions(data.transactions);
+    if(data.transactions&&data.transactions.length>0)renderTxs(data.transactions);
+    realApps=data.applications||[];
     if(realApps.length>0){renderHomeRecentApps(realApps);renderAppList(realApps,'all');}
-    if(realApps.length>0||(data.transactions&&data.transactions.length>0))renderActivityFeed(realApps,data.transactions||[]);
-  }catch(e){console.log('Stats load error:',e.message);}
+    if(realApps.length>0||(data.transactions&&data.transactions.length>0))renderActivity(realApps,data.transactions||[]);
+  }catch(e){console.log('Stats error:',e);}
 }
 
-function renderTransactions(txs){
+function renderTxs(txs){
   const el=document.getElementById('txList');
   if(!txs.length)return;
-  el.innerHTML=txs.map(tx=>`<div class="er"><div class="er-i ig">💸</div><div class="er-in"><div class="er-t">${tx.description||'Project payment'}</div><div class="er-d">${new Date(tx.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</div></div><div class="er-a" style="color:${tx.status==='paid'?'var(--gm)':'#92400e'}">${tx.status==='paid'?'+':''}₹${tx.amount.toLocaleString('en-IN')}</div></div>`).join('');
+  el.innerHTML=txs.map(t=>`<div class="er"><div class="er-i ig">💸</div><div class="er-in"><div class="er-t">${t.description||'Payment'}</div><div class="er-d">${new Date(t.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</div></div><div class="er-a" style="color:var(--gm)">+₹${t.amount.toLocaleString('en-IN')}</div></div>`).join('');
 }
 
-function renderActivityFeed(apps,txs){
+function renderActivity(apps,txs){
   const el=document.getElementById('activityFeed');
   const items=[];
-  txs.forEach(tx=>items.push({type:'earn',text:'Payment received',sub:tx.description||'Project',date:tx.createdAt,amt:'+₹'+tx.amount.toLocaleString('en-IN')}));
-  apps.slice(0,3).forEach(a=>items.push({type:'app',text:`Applied for "${a.jobTitle}"`,sub:a.brandName,date:a.appliedAt}));
+  txs.forEach(t=>items.push({type:'earn',text:'Payment received',sub:t.description||'Project',date:t.createdAt,amt:'+₹'+t.amount.toLocaleString('en-IN')}));
+  apps.slice(0,3).forEach(a=>items.push({type:'app',text:`Applied for "${a.jobTitle}"`,sub:a.brandName,date:a.createdAt||a.appliedAt}));
   items.sort((a,b)=>new Date(b.date)-new Date(a.date));
   if(!items.length)return;
-  el.innerHTML=items.slice(0,4).map(i=>`<div class="ai"><div class="a-ico ${i.type==='earn'?'ig':'ib2'}">${i.type==='earn'?'💸':'📋'}</div><div><div class="a-t">${i.text}</div><div class="a-s">${i.sub} · ${new Date(i.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</div></div>${i.amt?`<div class="a-amt">${i.amt}</div>`:''}</div>`).join('');
+  el.innerHTML=items.slice(0,4).map(i=>`<div class="ai_"><div class="a-ico ${i.type==='earn'?'ig':'ib2'}">${i.type==='earn'?'💸':'📋'}</div><div><div class="a-t">${i.text}</div><div class="a-s">${i.sub} · ${new Date(i.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</div></div>${i.amt?`<div class="a-amt">${i.amt}</div>`:''}</div>`).join('');
 }
 
 function renderHomeRecentApps(apps){
-  const card=document.getElementById('recentAppsCard');
-  const el=document.getElementById('homeRecentApps');
-  if(!apps.length)return;
-  card.style.display='block';
+  const card=document.getElementById('recentAppsCard');const el=document.getElementById('homeRecentApps');
+  if(!apps.length)return;card.style.display='block';
   const stMap={review:'<span class="tag trev">Under Review</span>',accepted:'<span class="tag tacc">✓ Accepted</span>',rejected:'<span class="tag trej">✗ Rejected</span>'};
   el.innerHTML=apps.slice(0,3).map(a=>`<div class="ac"><div class="a-ic">📋</div><div class="a-in"><div class="a-ti">${a.jobTitle}</div><div class="a-mt"><span>🏢 ${a.brandName}</span></div></div><div class="a-ri"><span class="a-py">${a.pay}</span>${stMap[a.status]||''}</div></div>`).join('');
 }
@@ -929,25 +745,26 @@ function renderHomeRecentApps(apps){
 function renderAppList(apps,filter){
   const el=document.getElementById('appList');
   let list=filter==='all'?apps:apps.filter(a=>a.status===filter);
-  if(!list.length){el.innerHTML=`<div class="empty-s"><div class="ei">📋</div><h3>No applications ${filter!=='all'?'here':''}</h3><p>Apply to projects to track them here.</p><button class="btn bpri" style="font-size:.79rem" onclick="goTo('projects',null)">Browse Projects →</button></div>`;return;}
+  if(!list.length){el.innerHTML=`<div class="empty-s"><div class="ei">📋</div><h3>No applications</h3><p>Apply to projects to track them here.</p><button class="btn bpri" style="font-size:.79rem" onclick="goTo('projects',null)">Browse Projects →</button></div>`;return;}
   const stMap={review:'<span class="tag trev">🔍 Under Review</span>',accepted:'<span class="tag tacc">✓ Accepted</span>',rejected:'<span class="tag trej">✗ Rejected</span>'};
-  el.innerHTML=list.map(a=>`<div class="ac"><div class="a-ic">📋</div><div class="a-in"><div class="a-ti">${a.jobTitle}</div><div class="a-mt"><span>🏢 ${a.brandName}</span><span>📅 ${new Date(a.appliedAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</span></div></div><div class="a-ri"><span class="a-py">${a.pay}</span>${stMap[a.status]||''}</div></div>`).join('');
+  el.innerHTML=list.map(a=>`<div class="ac"><div class="a-ic">📋</div><div class="a-in"><div class="a-ti">${a.jobTitle}</div><div class="a-mt"><span>🏢 ${a.brandName}</span><span>📅 ${new Date(a.createdAt||a.appliedAt).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</span></div></div><div class="a-ri"><span class="a-py">${a.pay}</span>${stMap[a.status]||''}</div></div>`).join('');
 }
 
 function filterApps(f,btn){document.querySelectorAll('.atab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderAppList(realApps,f);}
 
-// ════ LOAD USER DATA ════
-function loadUserData(){
-  if(!_u)return;
-  const name=_u.name||`${_u.firstName||''} ${_u.lastName||''}`.trim()||'Student';
-  const email=_u.email||'';
-  const college=_u.college||'';
-  const skills=Array.isArray(_u.skills)?_u.skills:[];
-  const joined=_u.createdAt?new Date(_u.createdAt).toLocaleDateString('en-IN',{month:'long',year:'numeric'}):'Recently';
+// LOAD USER DATA
+function loadUserData(userData){
+  const u=userData||_u;if(!u)return;
+  const name=u.name||`${u.firstName||''} ${u.lastName||''}`.trim()||'Student';
+  const email=u.email||'';const college=u.college||'';
+  const skills=Array.isArray(u.skills)?u.skills:[];
+  const bio=u.bio||'';const linkedin=u.linkedin||'';
+  const joined=u.createdAt?new Date(u.createdAt).toLocaleDateString('en-IN',{month:'long',year:'numeric'}):'Recently';
   userSkills=skills;
   const parts=name.split(' ').filter(Boolean);
   const initials=parts.length>=2?(parts[0][0]+parts[parts.length-1][0]).toUpperCase():(parts[0]?parts[0].slice(0,2).toUpperCase():'?');
-  const fn=_u.firstName||parts[0]||'';
+  const fn=u.firstName||parts[0]||'';
+
   document.querySelectorAll('#sbAv,#tbAv,#profAv').forEach(el=>el.textContent=initials);
   document.getElementById('sbNm').textContent=name;
   document.getElementById('profNm').textContent=name;
@@ -957,12 +774,11 @@ function loadUserData(){
   const h=new Date().getHours();
   const greet=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
   document.getElementById('wbGreet').textContent=`${greet}, ${fn}! 👋`;
-  // Pre-fill form
-  const pfn=document.getElementById('pfn');if(pfn)pfn.value=fn;
-  const pln=document.getElementById('pln');if(pln)pln.value=_u.lastName||parts.slice(1).join(' ')||'';
-  const pem=document.getElementById('pem');if(pem)pem.value=email;
-  const pcl=document.getElementById('pcl');if(pcl)pcl.value=college;
-  // Skills
+
+  // ✅ Pre-fill ALL fields including bio and linkedin
+  const fields={pfn:fn,pln:u.lastName||parts.slice(1).join(' ')||'',pem:email,pcl:college,pbio:bio,plink:linkedin};
+  Object.entries(fields).forEach(([id,val])=>{const el=document.getElementById(id);if(el)el.value=val||'';});
+
   const emojiMap={'Video Editing':'🎬','Graphic Design':'🎨','Web Development':'💻','Content Writing':'✍️','Social Media':'📱','Photography':'📸','Audio':'🎵','Data & Excel':'📊','AI Tools':'🤖'};
   const homeSkills=document.getElementById('homeSkills');
   if(skills.length>0){
@@ -972,21 +788,33 @@ function loadUserData(){
   }
   const profSkills=document.getElementById('profSkills');
   if(skills.length)profSkills.innerHTML=skills.map(s=>`<span>${emojiMap[s]||''} ${s}</span>`).join('');
-  document.querySelectorAll('.sk-opt').forEach(opt=>{if(skills.includes(opt.dataset.skill))opt.classList.add('sel');});
-  // Profile strength
+  document.querySelectorAll('.sk-opt').forEach(opt=>{opt.classList.toggle('sel',skills.includes(opt.dataset.skill));});
+
   let pct=20;
-  if(skills.length>0)pct+=30;
-  if(college)pct+=25;
-  if(_u.bio)pct+=15;
-  pct=Math.min(pct,85);
+  if(skills.length>0)pct+=30;if(college)pct+=25;if(bio)pct+=15;pct=Math.min(pct,90);
   document.getElementById('profPct').textContent=pct+'%';
   setTimeout(()=>{const f=document.getElementById('pcFill');if(f)f.style.width=pct+'%';},400);
   if(skills.length>0){document.getElementById('pcSkillRow').innerHTML='<div class="pk pk-d">✓</div><span style="color:var(--ts);font-size:.76rem;text-decoration:line-through">Skills added ('+skills.length+')</span>';document.getElementById('gsSkillNum').textContent='✓';document.getElementById('gsSkillNum').classList.add('done');}
   if(college)document.getElementById('pcCollegeRow').innerHTML='<div class="pk pk-d">✓</div><span style="color:var(--ts);font-size:.76rem;text-decoration:line-through">College added</span>';
+
   const wbDesc=document.getElementById('wbDesc');
-  if(skills.length>0){const matched=matchJobs(skills,ALL_JOBS).filter(j=>j.isMatch).length;wbDesc.textContent=`${matched} projects match your skills! Apply and start earning 💰`;}
-  else{wbDesc.textContent='Add your skills in Profile to get matched with brand projects!';}
+  if(skills.length>0){const m=matchJobs(skills,ALL_JOBS).filter(j=>j.isMatch).length;wbDesc.textContent=`${m} projects match your skills! Apply and start earning 💰`;}
+  else wbDesc.textContent='Add your skills in Profile to get matched with brand projects!';
   runAiMatching();
+}
+
+// ✅ FETCH FRESH DATA FROM SERVER — fixes bio/linkedin refresh issue
+async function fetchFreshProfile(){
+  try{
+    const res=await fetch('/api/profile',{headers:{'Authorization':'Bearer '+_tk}});
+    const data=await res.json();
+    if(data.success){
+      const updated={..._u,...data.user};
+      localStorage.setItem('ngg_user',JSON.stringify(updated));
+      Object.assign(_u,data.user);
+      loadUserData(updated);
+    }
+  }catch(e){}
 }
 
 function runAiMatching(){
@@ -1003,31 +831,29 @@ function runAiMatching(){
 
 function renderHomeMatchedJobs(jobs){
   const el=document.getElementById('homeMatchedJobs');
-  if(!el||!jobs.length){if(el)el.innerHTML='<div style="color:var(--ts);font-size:.82rem;padding:6px 0">Add skills in Profile to see matched projects here.</div>';return;}
+  if(!el||!jobs.length){if(el)el.innerHTML='<div style="color:var(--ts);font-size:.82rem;padding:6px 0">Add skills in Profile to see matched projects.</div>';return;}
   const bdg={hot:'<span class="tag th">🔥 Hot</span>',new:'<span class="tag tn">✨ New</span>',apply:'<span class="tag trev">📝 Apply</span>'};
-  el.innerHTML=jobs.map(j=>`<div class="pc" onclick="goTo('projects',null)" style="flex-direction:row;gap:10px;padding:11px"><div style="font-size:1.1rem;flex-shrink:0">${j.ico}</div><div style="flex:1;min-width:0"><div class="pn" style="font-size:.83rem">${j.title}</div><div class="pm" style="margin-top:2px">🏢 ${j.brand} · ${j.days}</div></div><div style="text-align:right;flex-shrink:0"><div class="pp" style="font-size:.88rem">${j.pay}</div>${bdg[j.badge]}</div></div>`).join('');
+  el.innerHTML=jobs.map(j=>`<div class="pc" onclick="goTo('projects',null)" style="flex-direction:row;gap:10px;padding:11px;margin-bottom:8px"><div style="font-size:1.1rem;flex-shrink:0">${j.ico}</div><div style="flex:1;min-width:0"><div class="pn" style="font-size:.83rem">${j.title}</div><div class="pm" style="margin-top:2px;font-size:.7rem;color:var(--ts)">🏢 ${j.brand} · ${j.days}</div></div><div style="text-align:right;flex-shrink:0"><div class="pp" style="font-size:.88rem">${j.pay}</div>${bdg[j.badge]}</div></div>`).join('');
 }
 
-// ════ PROJECTS RENDER ════
+// PROJECTS
 function renderProjects(){
   let jobs=curFilter==='ai'?aiJobs:ALL_JOBS;
   if(curCat!=='all')jobs=jobs.filter(j=>j.cat===curCat);
   if(curSearch)jobs=jobs.filter(j=>[j.title,j.brand,...(j.tags||[])].join(' ').toLowerCase().includes(curSearch));
   const grid=document.getElementById('projGrid');
-  if(!jobs.length){grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ts)"><div style="font-size:2rem;margin-bottom:8px">🔍</div><h3 style="font-family:'Clash Display',sans-serif;color:var(--td);margin-bottom:5px">No projects found</h3><p>Try different filter or <a href="#" onclick="goTo('profile',null);return false" style="color:var(--gm)">add more skills</a></p></div>`;return;}
+  if(!jobs.length){grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ts)"><div style="font-size:2rem;margin-bottom:8px">🔍</div><h3 style="font-family:'Clash Display',sans-serif;color:var(--td);margin-bottom:5px">No projects found</h3><p>Try different filter or add more skills</p></div>`;return;}
   const bdg={hot:'<span class="tag th">🔥 Hot</span>',new:'<span class="tag tn">✨ New</span>',apply:'<span class="tag trev">📝 Apply</span>'};
   grid.innerHTML=jobs.map(j=>{
-    const m=j.isMatch&&curFilter==='ai';
-    const mt=j.matchedTags||[];
-    return`<div class="pc ${m?'matched':''}" onclick="applyJob(${j.id})">${m?'<div class="match-bd">🤖 Match</div>':''}<div class="pt"><div class="pi">${j.ico}</div><div style="padding-right:${m?'70px':'0'}"><div class="pb_">${j.brand}</div><div class="pn">${j.title}</div></div></div><div class="ptgs">${(j.tags||[]).map(t=>`<span class="ptg ${mt.includes(t)?'mt':''}">${t}</span>`).join('')}</div><div class="pf"><div><div class="pp">${j.pay}</div><div class="pm">⏱ ${j.days} · 📍 Remote</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">${bdg[j.badge]}<button class="pa" onclick="event.stopPropagation();applyJob(${j.id})">Apply</button></div></div></div>`;
+    const m=j.isMatch&&curFilter==='ai';const mt=j.matchedTags||[];
+    return`<div class="pc ${m?'matched':''}" onclick="applyJob(${j.id})">${m?'<div class="match-bd">🤖 Match</div>':''}<div class="pt_"><div class="pi">${j.ico}</div><div style="padding-right:${m?'70px':'0'}"><div class="pb_">${j.brand}</div><div class="pn">${j.title}</div></div></div><div class="ptgs">${(j.tags||[]).map(t=>`<span class="ptg ${mt.includes(t)?'mt':''}">${t}</span>`).join('')}</div><div class="pf_"><div><div class="pp">${j.pay}</div><div class="pm">⏱ ${j.days} · 📍 Remote</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">${bdg[j.badge]}<button class="pa" onclick="event.stopPropagation();applyJob(${j.id})">Apply</button></div></div></div>`;
   }).join('');
 }
 
 function setFilter(f,btn){
   if(f==='ai'){curFilter='ai';curCat='all';}else{curFilter='manual';curCat=f;}
   document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
-  if(btn)btn.classList.add('active');
-  renderProjects();
+  if(btn)btn.classList.add('active');renderProjects();
 }
 
 async function applyJob(id){
@@ -1040,7 +866,7 @@ async function applyJob(id){
   }catch{showToast('Could not apply. Check connection.','error');}
 }
 
-// ════ PROFILE SAVE ════
+// PROFILE SAVE
 function toggleSk(el){el.classList.toggle('sel');gsap.fromTo(el,{scale:.92},{scale:1,duration:.25,ease:'back.out(2)'});}
 
 async function saveProfile(){
@@ -1054,30 +880,33 @@ async function saveProfile(){
   const linkedin=document.getElementById('plink').value.trim();
   if(!fn){showToast('Enter your first name','error');btn.innerHTML='💾 Save Changes';btn.disabled=false;return;}
   try{
-    const res=await fetch('/api/profile',{method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer '+_tk},body:JSON.stringify({firstName:fn,lastName:ln,college,skills,bio,linkedin})});
+    const res=await fetch('/api/profile',{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+_tk},
+      body:JSON.stringify({firstName:fn,lastName:ln,college,skills,bio,linkedin})
+    });
     const data=await res.json();
     if(data.success){
-      const updated={..._u,...data.user};
+      // ✅ Save everything to localStorage
+      const updated={..._u,...data.user,bio:bio,linkedin:linkedin};
       localStorage.setItem('ngg_user',JSON.stringify(updated));
-      Object.assign(_u,data.user);
+      Object.assign(_u,updated);
       userSkills=skills;
-      loadUserData();
-      showToast('Profile saved! Jobs re-matched 🎉','success');
+      loadUserData(updated);
+      showToast('Profile saved! ✅','success');
     }else showToast(data.message||'Save failed','error');
   }catch{
     const updated={..._u,firstName:fn,lastName:ln,name:`${fn} ${ln}`,college,skills,bio,linkedin};
     localStorage.setItem('ngg_user',JSON.stringify(updated));
-    Object.assign(_u,updated);
-    userSkills=skills;
-    loadUserData();
+    Object.assign(_u,updated);userSkills=skills;
+    loadUserData(updated);
     showToast('Saved locally!','info');
   }
   btn.innerHTML='💾 Save Changes';btn.disabled=false;
 }
 
-// ════ NAVIGATION ════
+// NAVIGATION
 const PT={home:'Dashboard',projects:'Browse Projects',applications:'My Applications',portfolio:'My Portfolio',earnings:'My Earnings',courses:'Skill Courses',mentors:'Mentors',profile:'My Profile'};
-
 function goTo(pg,navBtn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const el=document.getElementById('page-'+pg);if(el)el.classList.add('active');
@@ -1087,43 +916,49 @@ function goTo(pg,navBtn){
   document.getElementById('pgT').textContent=PT[pg]||'Dashboard';
   if(pg==='projects')renderProjects();
   if(pg==='applications')renderAppList(realApps,'all');
-  // ✅ Scroll to top on page change
   window.scrollTo({top:0,behavior:'smooth'});
-  document.getElementById('mc').scrollTop=0;
   closeSidebar();
   gsap.fromTo('#page-'+pg,{opacity:0,y:10},{opacity:1,y:0,duration:.28,ease:'power2.out'});
 }
 
-// ✅ MOBILE: Bottom nav active state
-function setBottomNav(page){
-  document.querySelectorAll('.bn-item').forEach(b=>b.classList.remove('active'));
-  const el=document.getElementById('bn-'+page);
-  if(el)el.classList.add('active');
-}
-
-// ✅ MOBILE: Sidebar open/close
+// ✅ MOBILE SIDEBAR
 function openSidebar(){
   document.getElementById('sidebar').classList.add('open');
   document.getElementById('overlay').classList.add('show');
   document.body.style.overflow='hidden';
 }
-
 function closeSidebar(){
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('overlay').classList.remove('show');
   document.body.style.overflow='';
 }
 
-// ════ TOAST & LOGOUT ════
-function showToast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type+' show';setTimeout(()=>t.className='toast',3500);}
-function logout(){gsap.to('.app',{opacity:0,duration:.3,onComplete:()=>{localStorage.removeItem('ngg_token');localStorage.removeItem('ngg_user');window.location.href='/login';}});}
+// BOTTOM NAV
+function setBottomNav(page){
+  document.querySelectorAll('.bn-item').forEach(b=>b.classList.remove('active'));
+  const el=document.getElementById('bn-'+page);if(el)el.classList.add('active');
+}
 
-// ════ INIT ════
+function showToast(msg,type='info'){
+  const t=document.getElementById('toast');t.textContent=msg;
+  t.className='toast '+type+' show';
+  setTimeout(()=>t.className='toast',3500);
+}
+function logout(){
+  gsap.to('.app',{opacity:0,duration:.3,onComplete:()=>{
+    localStorage.removeItem('ngg_token');
+    localStorage.removeItem('ngg_user');
+    window.location.href='/login';
+  }});
+}
+
+// INIT
 window.addEventListener('DOMContentLoaded',()=>{
   const d=new Date();
   document.getElementById('pgD').textContent=d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  loadUserData();
-  loadStats();
+  loadUserData();         // Instant from localStorage
+  loadStats();            // Real data from MongoDB
+  fetchFreshProfile();    // ✅ Bio/LinkedIn fix
   gsap.timeline({defaults:{ease:'power3.out'}})
     .fromTo('.sidebar',{x:-20,opacity:0},{x:0,opacity:1,duration:.5})
     .fromTo('.topbar',{y:-10,opacity:0},{y:0,opacity:1,duration:.4},'-=.3')
@@ -1131,4 +966,4 @@ window.addEventListener('DOMContentLoaded',()=>{
 });
 </script>
 </body>
-</html>
+</html> 
