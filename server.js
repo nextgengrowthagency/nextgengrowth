@@ -33,8 +33,8 @@ mongoose.connect(MONGO_URI)
 // SCHEMAS
 // ═══════════════════════════════════════════
 const userSchema = new mongoose.Schema({
-  firstName:{type:String,required:true},
-  lastName:{type:String,required:true},
+  firstName:{type:String,default:""}, // ✅ FIXED: required removed for Google Login
+  lastName:{type:String,default:""},  // ✅ FIXED: required removed for Google Login
   email:{type:String,required:true,unique:true,lowercase:true},
   password:{type:String,default:""},
   role:{type:String,enum:["student","brand"],required:true},
@@ -269,10 +269,14 @@ if(GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET){
           // New user — redirect to complete profile
           const role=req.session.googleRole||"student";
           const profile=u.googleProfile;
-          const names=(profile.displayName||"").split(" ");
+          
+          // ✅ FIXED: Better name extraction so it doesn't fail if Google gives empty names
+          const fName = profile.name?.givenName || profile.displayName?.split(" ")[0] || "User";
+          const lName = profile.name?.familyName || profile.displayName?.split(" ").slice(1).join(" ") || "";
+
           const newUser=await User.create({
-            firstName:names[0]||"User",
-            lastName:names.slice(1).join(" ")||"",
+            firstName: fName,
+            lastName: lName,
             email:profile.emails[0].value.toLowerCase(),
             password:"",role,
             googleId:profile.id,
