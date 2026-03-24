@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register – NextGenGrowth</title>
+  <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--gd:#064e2b;--gm:#0a7c44;--gb:#00c96b;--gg:#00ff88;--gl:#e8fdf2;--gp:#f0fdf6;--white:#fff;--off:#f7fdf9;--td:#0a1f12;--tm:#2d5a3d;--ts:#6b8f77;--br:#d1ead9}
+    html,body{min-height:100%;font-family:'Outfit',sans-serif;background:linear-gradient(135deg,var(--gd) 0%,#0d2a18 100%);display:flex;align-items:center;justify-content:center;padding:20px}
+    .wrap{width:100%;max-width:500px;position:relative}
+    .logo{display:flex;align-items:center;gap:9px;justify-content:center;margin-bottom:24px;text-decoration:none}
+    .ld{width:9px;height:9px;border-radius:50%;background:var(--gb);box-shadow:0 0 14px var(--gg);animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{box-shadow:0 0 8px var(--gg);transform:scale(1)}50%{box-shadow:0 0 24px var(--gg);transform:scale(1.3)}}
+    .logo-t{font-family:'Clash Display',sans-serif;font-size:1.4rem;font-weight:700;color:white}
+    .logo-t span{color:var(--gb)}
+    .card{background:var(--white);border-radius:20px;padding:36px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+    /* STEP INDICATOR */
+    .steps{display:flex;align-items:center;gap:0;margin-bottom:28px}
+    .step{display:flex;align-items:center;gap:8px;flex:1}
+    .step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Clash Display',sans-serif;font-size:.78rem;font-weight:700;transition:all .3s;flex-shrink:0}
+    .step-num.done{background:var(--gm);color:white}
+    .step-num.active{background:var(--gb);color:var(--gd);box-shadow:0 0 14px rgba(0,201,107,.4)}
+    .step-num.pending{background:var(--gl);color:var(--ts);border:1.5px solid var(--br)}
+    .step-lbl{font-size:.72rem;font-weight:600;color:var(--ts);transition:color .3s}
+    .step-lbl.active{color:var(--gm)}
+    .step-line{flex:1;height:2px;background:var(--br);margin:0 8px;border-radius:100px;transition:background .3s}
+    .step-line.done{background:var(--gm)}
+    /* PANELS */
+    .panel{display:none}
+    .panel.active{display:block;animation:fadeIn .3s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .panel-title{font-family:'Clash Display',sans-serif;font-size:1.4rem;font-weight:700;color:var(--td);margin-bottom:6px;letter-spacing:-.5px}
+    .panel-sub{font-size:.86rem;color:var(--ts);margin-bottom:24px}
+    .fg{margin-bottom:14px}
+    .fg label{display:block;font-size:.77rem;font-weight:600;color:var(--tm);margin-bottom:5px}
+    .fg:focus-within label{color:var(--gm)}
+    .fi{width:100%;background:var(--off);border:1.5px solid var(--br);border-radius:10px;padding:11px 14px;color:var(--td);font-family:'Outfit',sans-serif;font-size:.9rem;outline:none;transition:all .2s}
+    .fi:focus{border-color:var(--gb);background:white;box-shadow:0 0 0 3px rgba(0,201,107,.1)}
+    .fi::placeholder{color:#b0c9bb}
+    .fi.error{border-color:#dc2626;background:#fef2f2}
+    /* ROLE TOGGLE */
+    .role-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+    .role-card{border:2px solid var(--br);border-radius:13px;padding:18px;cursor:pointer;transition:all .25s;text-align:center;position:relative;overflow:hidden}
+    .role-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--gp),white);opacity:0;transition:opacity .3s}
+    .role-card:hover{border-color:var(--gb);transform:translateY(-2px)}
+    .role-card.sel{border-color:var(--gm);background:var(--gp)}
+    .role-card.sel::after{opacity:1}
+    .role-card .rc-ico{font-size:2rem;margin-bottom:8px;position:relative;z-index:1}
+    .role-card .rc-t{font-family:'Clash Display',sans-serif;font-size:.95rem;font-weight:700;color:var(--td);position:relative;z-index:1}
+    .role-card .rc-s{font-size:.76rem;color:var(--ts);margin-top:3px;position:relative;z-index:1}
+    .role-tick{display:none;position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;background:var(--gm);color:white;font-size:.65rem;align-items:center;justify-content:center;z-index:2}
+    .role-card.sel .role-tick{display:flex}
+    /* OTP BOX */
+    .otp-sent-box{background:var(--gp);border:1px solid var(--br);border-radius:12px;padding:14px;margin-bottom:16px;text-align:center}
+    .otp-sent-box p{font-size:.84rem;color:var(--tm);margin-bottom:4px}
+    .otp-sent-box strong{color:var(--gm)}
+    .otp-inputs{display:flex;gap:10px;justify-content:center;margin:16px 0}
+    .otp-inp{width:52px;height:58px;border:2px solid var(--br);border-radius:11px;text-align:center;font-family:'Clash Display',sans-serif;font-size:1.4rem;font-weight:700;color:var(--td);background:var(--off);outline:none;transition:all .2s}
+    .otp-inp:focus{border-color:var(--gb);background:white;box-shadow:0 0 0 3px rgba(0,201,107,.1)}
+    .otp-inp.filled{border-color:var(--gm);background:var(--gp)}
+    /* SKILLS */
+    .skill-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+    .sk{padding:7px 14px;border-radius:100px;font-size:.8rem;font-weight:500;border:1.5px solid var(--br);background:var(--white);color:var(--ts);cursor:pointer;transition:all .2s;user-select:none}
+    .sk:hover{border-color:var(--gb);color:var(--gm)}
+    .sk.sel{background:var(--gm);color:white;border-color:var(--gm)}
+    /* BUTTONS */
+    .btn-main{width:100%;padding:14px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--gm),var(--gd));color:white;font-family:'Clash Display',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 18px rgba(10,124,68,.25)}
+    .btn-main:hover{transform:translateY(-2px);box-shadow:0 8px 26px rgba(10,124,68,.35)}
+    .btn-main:disabled{opacity:.6;cursor:not-allowed;transform:none}
+    .btn-outline{width:100%;padding:12px;border:1.5px solid var(--br);border-radius:11px;background:transparent;color:var(--tm);font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;margin-top:10px}
+    .btn-outline:hover{background:var(--gp);border-color:var(--gb);color:var(--gm)}
+    /* GOOGLE BTN */
+    .google-btn{width:100%;padding:12px;border:1.5px solid var(--br);border-radius:11px;background:white;color:var(--td);font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px}
+    .google-btn:hover{border-color:#93c5fd;background:#fafeff;box-shadow:0 2px 12px rgba(0,0,0,.07)}
+    .divider{display:flex;align-items:center;gap:12px;margin-bottom:16px;color:var(--ts);font-size:.8rem}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--br)}
+    /* STRENGTH */
+    .strength{margin-top:6px}
+    .strength-bar{height:4px;border-radius:100px;background:var(--br);overflow:hidden;margin-bottom:4px}
+    .strength-fill{height:100%;border-radius:100px;transition:width .3s,background .3s}
+    .strength-txt{font-size:.72rem;font-weight:600}
+    .err-msg{font-size:.78rem;color:#dc2626;margin-top:4px;display:none}
+    .err-msg.show{display:block}
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:white;border-radius:50%;animation:sp .6s linear infinite;vertical-align:middle;margin-right:5px}
+    @keyframes sp{to{transform:rotate(360deg)}}
+    .login-link{text-align:center;margin-top:18px;font-size:.85rem;color:var(--ts)}
+    .login-link a{color:var(--gm);font-weight:600;text-decoration:none}
+    .resend-btn{background:none;border:none;color:var(--gm);font-size:.8rem;font-weight:600;cursor:pointer;text-decoration:underline}
+    .resend-btn:disabled{color:var(--ts);cursor:not-allowed;text-decoration:none}
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+  <a href="/login" class="logo"><div class="ld"></div><span class="logo-t">NextGen<span>Growth</span></span></a>
+
+  <div class="card">
+    <!-- STEP INDICATOR -->
+    <div class="steps">
+      <div class="step">
+        <div class="step-num active" id="sn1">1</div>
+        <span class="step-lbl active" id="sl1">Role</span>
+      </div>
+      <div class="step-line" id="line1"></div>
+      <div class="step">
+        <div class="step-num pending" id="sn2">2</div>
+        <span class="step-lbl" id="sl2">Verify Email</span>
+      </div>
+      <div class="step-line" id="line2"></div>
+      <div class="step">
+        <div class="step-num pending" id="sn3">3</div>
+        <span class="step-lbl" id="sl3">Details</span>
+      </div>
+    </div>
+
+    <!-- STEP 1 — ROLE + GOOGLE -->
+    <div class="panel active" id="step1">
+      <div class="panel-title">Join NextGenGrowth 🚀</div>
+      <div class="panel-sub">Choose your role to get started.</div>
+
+      <!-- Google Sign In -->
+      <button class="google-btn" id="googleStudent" onclick="googleLogin('student')">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continue with Google (Student)
+      </button>
+      <button class="google-btn" onclick="googleLogin('brand')">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continue with Google (Brand)
+      </button>
+
+      <div class="divider">or register with email</div>
+
+      <div class="role-grid">
+        <div class="role-card sel" id="roleStudent" onclick="selectRole('student')">
+          <div class="role-tick">✓</div>
+          <div class="rc-ico">🎓</div>
+          <div class="rc-t">Student</div>
+          <div class="rc-s">Find projects, earn money</div>
+        </div>
+        <div class="role-card" id="roleBrand" onclick="selectRole('brand')">
+          <div class="role-tick">✓</div>
+          <div class="rc-ico">🏢</div>
+          <div class="rc-t">Brand</div>
+          <div class="rc-s">Post projects, hire talent</div>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label>First Name</label>
+        <input class="fi" type="text" id="r_fn" placeholder="Your first name"/>
+      </div>
+      <div class="fg">
+        <label>Email Address</label>
+        <div style="display:flex;gap:8px">
+          <input class="fi" type="email" id="r_email" placeholder="you@example.com" style="flex:1"/>
+          <button class="btn-main" id="sendOtpBtn" onclick="sendOTP()" style="width:auto;padding:11px 18px;font-size:.82rem;white-space:nowrap">Send OTP</button>
+        </div>
+        <div class="err-msg" id="emailErr">Enter a valid email first.</div>
+      </div>
+      <div class="login-link">Already have an account? <a href="/login">Login →</a></div>
+    </div>
+
+    <!-- STEP 2 — OTP VERIFY -->
+    <div class="panel" id="step2">
+      <div class="panel-title">Verify Your Email ✉️</div>
+      <div class="panel-sub">Enter the 6-digit code we sent to your email.</div>
+
+      <div class="otp-sent-box">
+        <p>Code sent to <strong id="otpEmailDisplay">—</strong></p>
+        <p style="font-size:.78rem;color:var(--ts)">Check spam folder if not received.</p>
+      </div>
+
+      <div class="otp-inputs">
+        <input class="otp-inp" type="text" maxlength="1" id="o1" oninput="otpInput(this,1)"/>
+        <input class="otp-inp" type="text" maxlength="1" id="o2" oninput="otpInput(this,2)"/>
+        <input class="otp-inp" type="text" maxlength="1" id="o3" oninput="otpInput(this,3)"/>
+        <input class="otp-inp" type="text" maxlength="1" id="o4" oninput="otpInput(this,4)"/>
+        <input class="otp-inp" type="text" maxlength="1" id="o5" oninput="otpInput(this,5)"/>
+        <input class="otp-inp" type="text" maxlength="1" id="o6" oninput="otpInput(this,6)"/>
+      </div>
+
+      <div class="err-msg" id="otpErr" style="text-align:center;margin-bottom:12px">Invalid OTP. Try again.</div>
+
+      <button class="btn-main" id="verifyOtpBtn" onclick="verifyOTP()">✅ Verify Email</button>
+      <div style="text-align:center;margin-top:12px;font-size:.82rem;color:var(--ts)">
+        Didn't receive code? <button class="resend-btn" id="resendBtn" onclick="resendOTP()">Resend OTP</button>
+        <span id="resendTimer" style="color:var(--ts)"></span>
+      </div>
+      <button class="btn-outline" onclick="goStep(1)">← Back</button>
+    </div>
+
+    <!-- STEP 3 — DETAILS -->
+    <div class="panel" id="step3">
+      <div class="panel-title" id="step3Title">Complete Your Profile 📝</div>
+      <div class="panel-sub">Almost done! Fill in your details.</div>
+
+      <div class="g2">
+        <div class="fg"><label>First Name</label><input class="fi" type="text" id="r_fn2" placeholder="First name"/></div>
+        <div class="fg"><label>Last Name</label><input class="fi" type="text" id="r_ln" placeholder="Last name"/></div>
+      </div>
+      <div class="fg"><label>Email</label><input class="fi" type="email" id="r_email2" readonly style="opacity:.6;cursor:not-allowed"/></div>
+
+      <!-- Student fields -->
+      <div id="studentFields">
+        <div class="g2">
+          <div class="fg"><label>College / University</label><input class="fi" type="text" id="r_college" placeholder="e.g. Delhi University"/></div>
+          <div class="fg"><label>Year of Study</label>
+            <select class="fi" id="r_year" style="padding-left:13px">
+              <option value="">Select year...</option>
+              <option value="1st Year">1st Year</option>
+              <option value="2nd Year">2nd Year</option>
+              <option value="3rd Year">3rd Year</option>
+              <option value="4th Year">4th Year</option>
+              <option value="Post Graduate">Post Graduate</option>
+            </select>
+          </div>
+        </div>
+        <div class="fg">
+          <label>Your Skills (select all that apply)</label>
+          <div class="skill-grid">
+            <span class="sk" data-skill="Video Editing" onclick="toggleSkill(this)">🎬 Video Editing</span>
+            <span class="sk" data-skill="Graphic Design" onclick="toggleSkill(this)">🎨 Graphic Design</span>
+            <span class="sk" data-skill="Web Development" onclick="toggleSkill(this)">💻 Web Dev</span>
+            <span class="sk" data-skill="Content Writing" onclick="toggleSkill(this)">✍️ Content Writing</span>
+            <span class="sk" data-skill="Social Media" onclick="toggleSkill(this)">📱 Social Media</span>
+            <span class="sk" data-skill="Photography" onclick="toggleSkill(this)">📸 Photography</span>
+            <span class="sk" data-skill="Audio" onclick="toggleSkill(this)">🎵 Audio</span>
+            <span class="sk" data-skill="Data & Excel" onclick="toggleSkill(this)">📊 Data & Excel</span>
+            <span class="sk" data-skill="AI Tools" onclick="toggleSkill(this)">🤖 AI Tools</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Brand fields -->
+      <div id="brandFields" style="display:none">
+        <div class="fg"><label>Company / Brand Name</label><input class="fi" type="text" id="r_company" placeholder="e.g. StyleCo India"/></div>
+        <div class="fg"><label>What service do you need?</label>
+          <select class="fi" id="r_service" style="padding-left:13px">
+            <option value="">Select...</option>
+            <option>Video Editing / Reels</option>
+            <option>Graphic Design</option>
+            <option>Website Development</option>
+            <option>Content Writing</option>
+            <option>Social Media Management</option>
+            <option>Photography</option>
+            <option>Multiple Services</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label>Password</label>
+        <input class="fi" type="password" id="r_pass" placeholder="Min 8 characters" oninput="checkStrength(this.value)"/>
+        <div class="strength" id="strengthBox" style="display:none">
+          <div class="strength-bar"><div class="strength-fill" id="strengthFill" style="width:0%"></div></div>
+          <div class="strength-txt" id="strengthTxt"></div>
+        </div>
+      </div>
+      <div class="fg">
+        <label>Confirm Password</label>
+        <input class="fi" type="password" id="r_pass2" placeholder="Re-enter password"/>
+        <div class="err-msg" id="passErr">Passwords don't match!</div>
+      </div>
+
+      <div class="err-msg" id="regErr" style="margin-bottom:10px"></div>
+
+      <button class="btn-main" id="registerBtn" onclick="doRegister()">🚀 Create Account</button>
+      <button class="btn-outline" onclick="goStep(2)">← Back</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let selectedRole='student';
+let verifiedEmail='';
+
+// ════ GOOGLE LOGIN ════
+function googleLogin(role){
+  window.location.href=`/auth/google?role=${role}`;
+}
+
+// ════ ROLE SELECT ════
+function selectRole(role){
+  selectedRole=role;
+  document.getElementById('roleStudent').classList.toggle('sel',role==='student');
+  document.getElementById('roleBrand').classList.toggle('sel',role==='brand');
+}
+
+// ════ STEP NAVIGATION ════
+function goStep(n){
+  document.querySelectorAll('.panel').forEach((p,i)=>{
+    p.classList.toggle('active',i===n-1);
+  });
+  // Update step indicators
+  for(let i=1;i<=3;i++){
+    const num=document.getElementById(`sn${i}`);
+    const lbl=document.getElementById(`sl${i}`);
+    if(i<n){num.className='step-num done';num.textContent='✓';}
+    else if(i===n){num.className='step-num active';num.textContent=i;lbl.className='step-lbl active';}
+    else{num.className='step-num pending';num.textContent=i;lbl.className='step-lbl';}
+    if(i<3){
+      const line=document.getElementById(`line${i}`);
+      line.className='step-line'+(i<n?' done':'');
+    }
+  }
+}
+
+// ════ SEND OTP ════
+async function sendOTP(){
+  const email=document.getElementById('r_email').value.trim();
+  const name=document.getElementById('r_fn').value.trim()||'User';
+  const emailErr=document.getElementById('emailErr');
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    emailErr.classList.add('show');return;
+  }
+  emailErr.classList.remove('show');
+  const btn=document.getElementById('sendOtpBtn');
+  btn.innerHTML='<span class="spin"></span>Sending...';btn.disabled=true;
+  try{
+    const res=await fetch('/api/send-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,name})});
+    const data=await res.json();
+    if(data.success){
+      verifiedEmail=email;
+      document.getElementById('otpEmailDisplay').textContent=email;
+      document.getElementById('r_fn2').value=name;
+      document.getElementById('r_email2').value=email;
+      goStep(2);
+      startResendTimer();
+    }else{
+      emailErr.textContent=data.message||'Could not send OTP.';emailErr.classList.add('show');
+    }
+  }catch{emailErr.textContent='Server error. Try again.';emailErr.classList.add('show');}
+  btn.innerHTML='Send OTP';btn.disabled=false;
+}
+
+// ════ OTP INPUT ════
+function otpInput(inp,idx){
+  inp.value=inp.value.replace(/\D/g,'');
+  if(inp.value.length===1&&inp.classList.add('filled')&&idx<6)document.getElementById('o'+(idx+1)).focus();
+  if(inp.value.length===0)inp.classList.remove('filled');
+}
+
+function getOTP(){
+  return[1,2,3,4,5,6].map(i=>document.getElementById('o'+i).value).join('');
+}
+
+// ════ VERIFY OTP ════
+async function verifyOTP(){
+  const otp=getOTP();
+  if(otp.length!==6){document.getElementById('otpErr').classList.add('show');return;}
+  const btn=document.getElementById('verifyOtpBtn');
+  btn.innerHTML='<span class="spin"></span>Verifying...';btn.disabled=true;
+  try{
+    const res=await fetch('/api/verify-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:verifiedEmail,otp})});
+    const data=await res.json();
+    if(data.success){
+      document.getElementById('otpErr').classList.remove('show');
+      // Show correct fields
+      if(selectedRole==='brand'){
+        document.getElementById('studentFields').style.display='none';
+        document.getElementById('brandFields').style.display='block';
+        document.getElementById('step3Title').textContent='Brand Details 🏢';
+      }else{
+        document.getElementById('studentFields').style.display='block';
+        document.getElementById('brandFields').style.display='none';
+      }
+      goStep(3);
+    }else{
+      document.getElementById('otpErr').textContent=data.message||'Invalid OTP.';
+      document.getElementById('otpErr').classList.add('show');
+    }
+  }catch{document.getElementById('otpErr').textContent='Server error.';document.getElementById('otpErr').classList.add('show');}
+  btn.innerHTML='✅ Verify Email';btn.disabled=false;
+}
+
+// Resend timer
+let resendInterval=null;
+function startResendTimer(){
+  const btn=document.getElementById('resendBtn');
+  const timer=document.getElementById('resendTimer');
+  btn.disabled=true;
+  let secs=60;
+  timer.textContent=` (${secs}s)`;
+  resendInterval=setInterval(()=>{
+    secs--;timer.textContent=` (${secs}s)`;
+    if(secs<=0){clearInterval(resendInterval);btn.disabled=false;timer.textContent='';}
+  },1000);
+}
+
+async function resendOTP(){
+  clearInterval(resendInterval);
+  await sendOTP();
+}
+
+// ════ PASSWORD STRENGTH ════
+function checkStrength(val){
+  const box=document.getElementById('strengthBox');
+  const fill=document.getElementById('strengthFill');
+  const txt=document.getElementById('strengthTxt');
+  if(!val){box.style.display='none';return;}
+  box.style.display='block';
+  let score=0;
+  if(val.length>=8)score++;
+  if(/[A-Z]/.test(val))score++;
+  if(/[0-9]/.test(val))score++;
+  if(/[^A-Za-z0-9]/.test(val))score++;
+  const levels=[{w:'25%',c:'#dc2626',t:'Weak'},{w:'50%',c:'#f59e0b',t:'Fair'},{w:'75%',c:'#3b82f6',t:'Good'},{w:'100%',c:'#00c96b',t:'Strong 💪'}];
+  const l=levels[score-1]||levels[0];
+  fill.style.width=l.w;fill.style.background=l.c;txt.textContent=l.t;txt.style.color=l.c;
+}
+
+function toggleSkill(el){el.classList.toggle('sel');gsap.fromTo(el,{scale:.92},{scale:1,duration:.2,ease:'back.out(2)'});}
+
+// ════ REGISTER ════
+async function doRegister(){
+  const fn=document.getElementById('r_fn2').value.trim();
+  const ln=document.getElementById('r_ln').value.trim();
+  const pass=document.getElementById('r_pass').value;
+  const pass2=document.getElementById('r_pass2').value;
+  const passErr=document.getElementById('passErr');
+  const regErr=document.getElementById('regErr');
+  passErr.classList.remove('show');regErr.classList.remove('show');
+  if(!fn||!ln){regErr.textContent='Enter first and last name.';regErr.classList.add('show');return;}
+  if(pass.length<8){regErr.textContent='Password must be 8+ characters.';regErr.classList.add('show');return;}
+  if(pass!==pass2){passErr.classList.add('show');return;}
+  const skills=[...document.querySelectorAll('.sk.sel')].map(e=>e.dataset.skill);
+  const college=document.getElementById('r_college')?.value?.trim()||'';
+  const year=document.getElementById('r_year')?.value||'';
+  const company=document.getElementById('r_company')?.value?.trim()||'';
+  const service=document.getElementById('r_service')?.value||'';
+  const btn=document.getElementById('registerBtn');
+  btn.innerHTML='<span class="spin"></span>Creating account...';btn.disabled=true;
+  try{
+    const res=await fetch('/api/register',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({firstName:fn,lastName:ln,email:verifiedEmail,password:pass,role:selectedRole,college,year,skills,companyName:company,serviceNeeded:service})
+    });
+    const data=await res.json();
+    if(data.success){
+      localStorage.setItem('ngg_token',data.token);
+      localStorage.setItem('ngg_user',JSON.stringify(data.user));
+      gsap.to('.card',{scale:.97,opacity:0,duration:.3,onComplete:()=>{
+        window.location.href=data.user.role==='brand'?'/brand-dashboard':'/dashboard';
+      }});
+    }else{
+      regErr.textContent=data.message||'Registration failed.';regErr.classList.add('show');
+    }
+  }catch{regErr.textContent='Server error. Try again.';regErr.classList.add('show');}
+  btn.innerHTML='🚀 Create Account';btn.disabled=false;
+}
+
+// Animate in
+window.addEventListener('DOMContentLoaded',()=>{
+  gsap.from('.card',{y:30,opacity:0,duration:.7,ease:'power3.out'});
+  gsap.from('.logo',{y:-10,opacity:0,duration:.5,ease:'power2.out'});
+});
+</script>
+</body>
+</html>

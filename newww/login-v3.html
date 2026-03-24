@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login – NextGenGrowth</title>
+  <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--gd:#064e2b;--gm:#0a7c44;--gb:#00c96b;--gg:#00ff88;--gl:#e8fdf2;--gp:#f0fdf6;--white:#fff;--off:#f7fdf9;--td:#0a1f12;--tm:#2d5a3d;--ts:#6b8f77;--br:#d1ead9}
+    html,body{min-height:100%;font-family:'Outfit',sans-serif;background:linear-gradient(135deg,var(--gd) 0%,#0d2a18 100%);display:flex;align-items:center;justify-content:center;padding:20px}
+    canvas{position:fixed;inset:0;pointer-events:none;opacity:.4}
+    .wrap{width:100%;max-width:440px;position:relative;z-index:2}
+    .logo{display:flex;align-items:center;gap:9px;justify-content:center;margin-bottom:24px;text-decoration:none}
+    .ld{width:9px;height:9px;border-radius:50%;background:var(--gb);box-shadow:0 0 14px var(--gg);animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{box-shadow:0 0 8px var(--gg);transform:scale(1)}50%{box-shadow:0 0 24px var(--gg);transform:scale(1.3)}}
+    .logo-t{font-family:'Clash Display',sans-serif;font-size:1.4rem;font-weight:700;color:white}
+    .logo-t span{color:var(--gb)}
+    .card{background:var(--white);border-radius:20px;padding:36px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+    .card-title{font-family:'Clash Display',sans-serif;font-size:1.6rem;font-weight:700;color:var(--td);margin-bottom:6px;letter-spacing:-.5px}
+    .card-sub{font-size:.87rem;color:var(--ts);margin-bottom:28px}
+    /* ROLE TOGGLE */
+    .role-toggle{display:flex;background:var(--off);border:1.5px solid var(--br);border-radius:11px;padding:4px;margin-bottom:22px}
+    .role-btn{flex:1;padding:9px;border-radius:8px;font-family:'Outfit',sans-serif;font-size:.87rem;font-weight:600;border:none;cursor:pointer;transition:all .2s;color:var(--ts);background:transparent}
+    .role-btn.active{background:white;color:var(--gd);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+    /* GOOGLE BTN */
+    .google-btn{width:100%;padding:13px;border:1.5px solid var(--br);border-radius:11px;background:white;color:var(--td);font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px}
+    .google-btn:hover{border-color:#93c5fd;box-shadow:0 2px 12px rgba(0,0,0,.07);transform:translateY(-1px)}
+    .divider{display:flex;align-items:center;gap:12px;margin-bottom:20px;color:var(--ts);font-size:.8rem}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--br)}
+    .fg{margin-bottom:16px}
+    .fg label{display:block;font-size:.77rem;font-weight:600;color:var(--tm);margin-bottom:6px}
+    .fi{width:100%;background:var(--off);border:1.5px solid var(--br);border-radius:10px;padding:12px 14px;color:var(--td);font-family:'Outfit',sans-serif;font-size:.9rem;outline:none;transition:all .2s}
+    .fi:focus{border-color:var(--gb);background:white;box-shadow:0 0 0 3px rgba(0,201,107,.1)}
+    .fi::placeholder{color:#b0c9bb}
+    .pass-wrap{position:relative}
+    .pass-wrap .fi{padding-right:44px}
+    .show-pass{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--ts);font-size:.8rem;font-weight:600}
+    .btn-main{width:100%;padding:14px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--gm),var(--gd));color:white;font-family:'Clash Display',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 18px rgba(10,124,68,.25)}
+    .btn-main:hover{transform:translateY(-2px);box-shadow:0 8px 26px rgba(10,124,68,.35)}
+    .btn-main:disabled{opacity:.6;cursor:not-allowed;transform:none}
+    .err-box{background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:10px 14px;font-size:.82rem;color:#dc2626;margin-bottom:14px;display:none;text-align:center}
+    .err-box.show{display:block}
+    .links{display:flex;justify-content:space-between;align-items:center;margin-top:16px;font-size:.84rem;color:var(--ts)}
+    .links a{color:var(--gm);font-weight:600;text-decoration:none}
+    .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:white;border-radius:50%;animation:sp .6s linear infinite;vertical-align:middle;margin-right:5px}
+    @keyframes sp{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div class="wrap">
+  <a href="/" class="logo"><div class="ld"></div><span class="logo-t">NextGen<span>Growth</span></span></a>
+
+  <div class="card">
+    <div class="card-title">Welcome Back 👋</div>
+    <div class="card-sub">Login to your NextGenGrowth account.</div>
+
+    <!-- Google Sign In -->
+    <button class="google-btn" onclick="window.location.href='/auth/google?role='+document.querySelector('.role-btn.active').dataset.role">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Continue with Google
+    </button>
+
+    <div class="divider">or login with email</div>
+
+    <!-- Role Toggle -->
+    <div class="role-toggle">
+      <button class="role-btn active" data-role="student" onclick="setRole(this)">🎓 Student</button>
+      <button class="role-btn" data-role="brand" onclick="setRole(this)">🏢 Brand</button>
+    </div>
+
+    <div class="err-box" id="errBox">Invalid email or password.</div>
+
+    <div class="fg">
+      <label>Email Address</label>
+      <input class="fi" type="email" id="loginEmail" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <div class="fg">
+      <label>Password</label>
+      <div class="pass-wrap">
+        <input class="fi" type="password" id="loginPass" placeholder="Your password" onkeydown="if(event.key==='Enter')doLogin()"/>
+        <button class="show-pass" onclick="togglePass()">Show</button>
+      </div>
+    </div>
+
+    <button class="btn-main" id="loginBtn" onclick="doLogin()">Login →</button>
+
+    <div class="links">
+      <a href="/register">Create account →</a>
+      <a href="#" onclick="showToast('Password reset coming soon!','info');return false">Forgot password?</a>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" style="position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);padding:11px 20px;border-radius:100px;font-size:.83rem;font-weight:500;z-index:999;opacity:0;white-space:nowrap;transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .3s;max-width:90vw"></div>
+
+<script>
+// Particles
+(function(){
+  const c=document.getElementById('c');const ctx=c.getContext('2d');
+  let w,h,pts=[];
+  function resize(){c.width=w=window.innerWidth;c.height=h=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  for(let i=0;i<60;i++)pts.push({x:Math.random()*1920,y:Math.random()*1080,r:Math.random()*1.2+.3,vx:(Math.random()-.5)*.2,vy:(Math.random()-.5)*.2,a:Math.random()*Math.PI*2});
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.a+=.005;if(p.x<0||p.x>w)p.vx*=-1;if(p.y<0||p.y>h)p.vy*=-1;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(0,255,136,${.12+.06*Math.sin(p.a)})`;ctx.fill();});
+    requestAnimationFrame(draw);
+  }draw();
+})();
+
+function setRole(btn){
+  document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function togglePass(){
+  const inp=document.getElementById('loginPass');
+  inp.type=inp.type==='password'?'text':'password';
+}
+
+async function doLogin(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  const role=document.querySelector('.role-btn.active').dataset.role;
+  const errBox=document.getElementById('errBox');
+  errBox.classList.remove('show');
+  if(!email||!pass){errBox.textContent='Enter email and password.';errBox.classList.add('show');return;}
+  const btn=document.getElementById('loginBtn');
+  btn.innerHTML='<span class="spin"></span>Logging in...';btn.disabled=true;
+  try{
+    const res=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass,role})});
+    const data=await res.json();
+    if(data.success){
+      localStorage.setItem('ngg_token',data.token);
+      localStorage.setItem('ngg_user',JSON.stringify(data.user));
+      gsap.to('.card',{scale:.97,opacity:0,duration:.3,onComplete:()=>{
+        window.location.href=data.user.role==='brand'?'/brand-dashboard':'/dashboard';
+      }});
+    }else{
+      errBox.textContent=data.message||'Invalid credentials.';errBox.classList.add('show');
+      gsap.fromTo('.card',{x:-8},{x:0,duration:.07,repeat:4,yoyo:true,ease:'none'});
+    }
+  }catch{errBox.textContent='Server error. Check connection.';errBox.classList.add('show');}
+  btn.innerHTML='Login →';btn.disabled=false;
+}
+
+function showToast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.style.background=type==='info'?'#0a1f12':'#064e2b';t.style.color='white';t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(-50%) translateY(80px)';},3000);}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  gsap.from('.card',{y:30,opacity:0,duration:.7,ease:'power3.out'});
+  gsap.from('.logo',{y:-10,opacity:0,duration:.5});
+  // Check for error in URL
+  const p=new URLSearchParams(location.search);
+  if(p.get('error')){document.getElementById('errBox').textContent='Google login failed. Try again.';document.getElementById('errBox').classList.add('show');}
+});
+</script>
+</body>
+</html>
