@@ -99,8 +99,13 @@ console.log("✅ All models loaded!");
 // EMAIL
 // ═══════════════════════════════════════════
 const transporter = nodemailer.createTransport({
-  service:"gmail",
-  auth:{user:GMAIL_USER,pass:GMAIL_PASS}
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: GMAIL_USER,
+    pass: GMAIL_PASS
+  }
 });
 transporter.verify((err)=>{
   if(err)console.log("⚠️ Email not connected:",err.message);
