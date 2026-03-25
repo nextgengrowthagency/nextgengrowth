@@ -3,161 +3,1452 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login – NextGenGrowth</title>
-  <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <title>Login – NextGenGrowth | Hire & Learn. Work & Earn.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
+    /* ============= RESET & ROOT ============= */
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--gd:#064e2b;--gm:#0a7c44;--gb:#00c96b;--gg:#00ff88;--gl:#e8fdf2;--gp:#f0fdf6;--white:#fff;--off:#f7fdf9;--td:#0a1f12;--tm:#2d5a3d;--ts:#6b8f77;--br:#d1ead9}
-    html,body{min-height:100%;font-family:'Outfit',sans-serif;background:linear-gradient(135deg,var(--gd) 0%,#0d2a18 100%);display:flex;align-items:center;justify-content:center;padding:20px}
-    canvas{position:fixed;inset:0;pointer-events:none;opacity:.4}
-    .wrap{width:100%;max-width:440px;position:relative;z-index:2}
-    .logo{display:flex;align-items:center;gap:9px;justify-content:center;margin-bottom:24px;text-decoration:none}
-    .ld{width:9px;height:9px;border-radius:50%;background:var(--gb);box-shadow:0 0 14px var(--gg);animation:pulse 2s infinite}
-    @keyframes pulse{0%,100%{box-shadow:0 0 8px var(--gg);transform:scale(1)}50%{box-shadow:0 0 24px var(--gg);transform:scale(1.3)}}
-    .logo-t{font-family:'Clash Display',sans-serif;font-size:1.4rem;font-weight:700;color:white}
-    .logo-t span{color:var(--gb)}
-    .card{background:var(--white);border-radius:20px;padding:36px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-    .card-title{font-family:'Clash Display',sans-serif;font-size:1.6rem;font-weight:700;color:var(--td);margin-bottom:6px;letter-spacing:-.5px}
-    .card-sub{font-size:.87rem;color:var(--ts);margin-bottom:28px}
-    /* ROLE TOGGLE */
-    .role-toggle{display:flex;background:var(--off);border:1.5px solid var(--br);border-radius:11px;padding:4px;margin-bottom:22px}
-    .role-btn{flex:1;padding:9px;border-radius:8px;font-family:'Outfit',sans-serif;font-size:.87rem;font-weight:600;border:none;cursor:pointer;transition:all .2s;color:var(--ts);background:transparent}
-    .role-btn.active{background:white;color:var(--gd);box-shadow:0 2px 8px rgba(0,0,0,.08)}
-    /* GOOGLE BTN */
-    .google-btn{width:100%;padding:13px;border:1.5px solid var(--br);border-radius:11px;background:white;color:var(--td);font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px}
-    .google-btn:hover{border-color:#93c5fd;box-shadow:0 2px 12px rgba(0,0,0,.07);transform:translateY(-1px)}
-    .divider{display:flex;align-items:center;gap:12px;margin-bottom:20px;color:var(--ts);font-size:.8rem}
-    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--br)}
-    .fg{margin-bottom:16px}
-    .fg label{display:block;font-size:.77rem;font-weight:600;color:var(--tm);margin-bottom:6px}
-    .fi{width:100%;background:var(--off);border:1.5px solid var(--br);border-radius:10px;padding:12px 14px;color:var(--td);font-family:'Outfit',sans-serif;font-size:.9rem;outline:none;transition:all .2s}
-    .fi:focus{border-color:var(--gb);background:white;box-shadow:0 0 0 3px rgba(0,201,107,.1)}
-    .fi::placeholder{color:#b0c9bb}
-    .pass-wrap{position:relative}
-    .pass-wrap .fi{padding-right:44px}
-    .show-pass{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--ts);font-size:.8rem;font-weight:600}
-    .btn-main{width:100%;padding:14px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--gm),var(--gd));color:white;font-family:'Clash Display',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 18px rgba(10,124,68,.25)}
-    .btn-main:hover{transform:translateY(-2px);box-shadow:0 8px 26px rgba(10,124,68,.35)}
-    .btn-main:disabled{opacity:.6;cursor:not-allowed;transform:none}
-    .err-box{background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:10px 14px;font-size:.82rem;color:#dc2626;margin-bottom:14px;display:none;text-align:center}
-    .err-box.show{display:block}
-    .links{display:flex;justify-content:space-between;align-items:center;margin-top:16px;font-size:.84rem;color:var(--ts)}
-    .links a{color:var(--gm);font-weight:600;text-decoration:none}
-    .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:white;border-radius:50%;animation:sp .6s linear infinite;vertical-align:middle;margin-right:5px}
-    @keyframes sp{to{transform:rotate(360deg)}}
+    :root{
+      --gd:#064e2b;
+      --gm:#0a7c44;
+      --gb:#00c96b;
+      --gg:#00ff88;
+      --gl:#e8fdf2;
+      --gp:#f0fdf6;
+      --white:#fff;
+      --off:#f7fdf9;
+      --td:#0a1f12;
+      --tm:#2d5a3d;
+      --ts:#6b8f77;
+      --br:#d1ead9;
+      --accent-blue:#3b82f6;
+      --accent-purple:#a855f7;
+      --accent-pink:#ec4899;
+      --error:#ef4444;
+      --success:#22c55e
+    }
+
+    html,body{
+      min-height:100%;
+      font-family:'Outfit',sans-serif;
+      background:linear-gradient(135deg,var(--gd) 0%,#0d2a18 50%,#051a0f 100%);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      overflow-x:hidden;
+      position:relative
+    }
+
+    /* ============= ANIMATED BACKGROUND ============= */
+    canvas#c{position:fixed;inset:0;pointer-events:none;opacity:.5}
+
+    .animated-bg{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      overflow:hidden
+    }
+
+    .blob{
+      position:absolute;
+      border-radius:50%;
+      filter:blur(60px);
+      opacity:.3;
+      animation:float 20s infinite ease-in-out
+    }
+
+    .blob-1{
+      width:300px;
+      height:300px;
+      background:rgba(0,201,107,.4);
+      top:-100px;
+      left:-100px;
+      animation-delay:0s
+    }
+
+    .blob-2{
+      width:250px;
+      height:250px;
+      background:rgba(59,130,246,.3);
+      bottom:-50px;
+      right:-50px;
+      animation-delay:7s
+    }
+
+    .blob-3{
+      width:200px;
+      height:200px;
+      background:rgba(168,85,247,.2);
+      top:50%;
+      right:10%;
+      animation-delay:14s
+    }
+
+    @keyframes float{
+      0%,100%{transform:translate(0,0)}
+      33%{transform:translate(30px,-50px)}
+      66%{transform:translate(-20px,30px)}
+    }
+
+    /* ============= MAIN WRAPPER ============= */
+    .wrap{
+      width:100%;
+      max-width:1100px;
+      position:relative;
+      z-index:2;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:60px;
+      align-items:center;
+    }
+
+    @media (max-width:768px){
+      .wrap{
+        grid-template-columns:1fr;
+        gap:40px;
+        max-width:500px
+      }
+    }
+
+    /* ============= LEFT SECTION - BRANDING ============= */
+    .left-section{
+      display:flex;
+      flex-direction:column;
+      gap:30px;
+      padding:40px
+    }
+
+    .logo{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-decoration:none;
+      animation:slideInLeft .8s ease-out
+    }
+
+    .logo-dot{
+      width:12px;
+      height:12px;
+      border-radius:50%;
+      background:linear-gradient(135deg,var(--gb),var(--gg));
+      box-shadow:0 0 20px var(--gg);
+      animation:pulse 2.5s infinite;
+      position:relative
+    }
+
+    .logo-dot::before{
+      content:'';
+      position:absolute;
+      inset:-8px;
+      border:2px solid var(--gb);
+      border-radius:50%;
+      animation:rotateDot 4s linear infinite
+    }
+
+    @keyframes rotateDot{to{transform:rotate(360deg)}}
+
+    @keyframes pulse{
+      0%,100%{box-shadow:0 0 12px var(--gg),0 0 24px rgba(0,255,136,.3);transform:scale(1)}
+      50%{box-shadow:0 0 24px var(--gg),0 0 48px rgba(0,255,136,.6);transform:scale(1.15)}
+    }
+
+    .logo-text{
+      font-family:'Clash Display',sans-serif;
+      font-size:1.6rem;
+      font-weight:700;
+      color:white;
+      letter-spacing:-.3px
+    }
+
+    .logo-text span{
+      background:linear-gradient(135deg,var(--gb),var(--gg));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text
+    }
+
+    .tagline{
+      font-size:3rem;
+      font-weight:700;
+      font-family:'Clash Display',sans-serif;
+      color:white;
+      line-height:1.2;
+      animation:slideInLeft 1s ease-out .2s both
+    }
+
+    .tagline-desc{
+      font-size:1.1rem;
+      color:rgba(255,255,255,.7);
+      line-height:1.6;
+      animation:slideInLeft 1s ease-out .4s both
+    }
+
+    .features{
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      animation:slideInLeft 1s ease-out .6s both
+    }
+
+    .feature-item{
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+      padding:14px;
+      background:rgba(255,255,255,.05);
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.1);
+      transition:all .3s;
+    }
+
+    .feature-item:hover{
+      background:rgba(0,201,107,.1);
+      border-color:rgba(0,201,107,.3);
+      transform:translateX(8px)
+    }
+
+    .feature-icon{
+      width:40px;
+      height:40px;
+      border-radius:10px;
+      background:linear-gradient(135deg,var(--gb),var(--gg));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:white;
+      font-size:1.2rem;
+      flex-shrink:0;
+      box-shadow:0 4px 12px rgba(0,201,107,.3)
+    }
+
+    .feature-text{
+      display:flex;
+      flex-direction:column;
+      gap:4px
+    }
+
+    .feature-title{
+      font-weight:600;
+      color:white;
+      font-size:.95rem
+    }
+
+    .feature-desc{
+      font-size:.8rem;
+      color:rgba(255,255,255,.6)
+    }
+
+    /* ============= RIGHT SECTION - LOGIN CARD ============= */
+    .right-section{
+      animation:slideInRight 1s ease-out
+    }
+
+    .card{
+      background:rgba(255,255,255,.95);
+      backdrop-filter:blur(10px);
+      border:1px solid rgba(255,255,255,.2);
+      border-radius:24px;
+      padding:48px;
+      box-shadow:0 20px 60px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.5);
+      position:relative;
+      overflow:hidden
+    }
+
+    .card::before{
+      content:'';
+      position:absolute;
+      inset:0;
+      background:radial-gradient(circle at 100% 0,rgba(0,201,107,.05),transparent 70%);
+      pointer-events:none
+    }
+
+    .card-content{
+      position:relative;
+      z-index:2
+    }
+
+    .card-header{
+      margin-bottom:32px;
+      text-align:center
+    }
+
+    .card-title{
+      font-family:'Clash Display',sans-serif;
+      font-size:2rem;
+      font-weight:700;
+      color:var(--td);
+      margin-bottom:10px;
+      background:linear-gradient(135deg,var(--gd),var(--gm));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text
+    }
+
+    .card-sub{
+      font-size:.95rem;
+      color:var(--ts);
+      font-weight:400
+    }
+
+    /* ============= ROLE TOGGLE ============= */
+    .role-toggle{
+      display:flex;
+      background:linear-gradient(135deg,var(--off),var(--gp));
+      border:2px solid var(--br);
+      border-radius:14px;
+      padding:5px;
+      margin-bottom:28px;
+      gap:8px;
+      box-shadow:inset 0 2px 8px rgba(0,0,0,.05)
+    }
+
+    .role-btn{
+      flex:1;
+      padding:12px 16px;
+      border-radius:11px;
+      font-family:'Outfit',sans-serif;
+      font-size:.9rem;
+      font-weight:600;
+      border:2px solid transparent;
+      cursor:pointer;
+      transition:all .3s cubic-bezier(.34,1.56,.64,1);
+      color:var(--ts);
+      background:transparent;
+      position:relative;
+      overflow:hidden
+    }
+
+    .role-btn::before{
+      content:'';
+      position:absolute;
+      inset:0;
+      background:linear-gradient(135deg,var(--gb),var(--gg));
+      opacity:0;
+      transition:opacity .3s;
+      z-index:-1
+    }
+
+    .role-btn.active{
+      background:white;
+      color:var(--gd);
+      font-weight:700;
+      box-shadow:0 4px 16px rgba(0,201,107,.2);
+      border-color:var(--gb);
+      transform:scale(1.02)
+    }
+
+    .role-btn.active::after{
+      content:'';
+      position:absolute;
+      right:8px;
+      top:50%;
+      transform:translateY(-50%);
+      width:6px;
+      height:6px;
+      border-radius:50%;
+      background:var(--gb);
+      box-shadow:0 0 8px var(--gb)
+    }
+
+    .role-btn:hover:not(.active){
+      color:var(--gm);
+      transform:translateY(-2px)
+    }
+
+    /* ============= GOOGLE SIGN IN ============= */
+    .oauth-section{
+      margin-bottom:24px
+    }
+
+    .google-btn{
+      width:100%;
+      padding:14px;
+      border:2px solid var(--br);
+      border-radius:12px;
+      background:white;
+      color:var(--td);
+      font-family:'Outfit',sans-serif;
+      font-size:.9rem;
+      font-weight:600;
+      cursor:pointer;
+      transition:all .3s;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      position:relative;
+      overflow:hidden
+    }
+
+    .google-btn::before{
+      content:'';
+      position:absolute;
+      inset:0;
+      background:linear-gradient(135deg,rgba(0,201,107,.1),rgba(59,130,246,.1));
+      opacity:0;
+      transition:opacity .3s
+    }
+
+    .google-btn:hover{
+      border-color:var(--gb);
+      box-shadow:0 8px 24px rgba(0,201,107,.15);
+      transform:translateY(-3px);
+      background:linear-gradient(135deg,#fafafa,#f5fdf9)
+    }
+
+    .google-btn:hover::before{
+      opacity:1
+    }
+
+    .google-icon{
+      width:20px;
+      height:20px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .divider{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      margin:28px 0;
+      color:var(--ts);
+      font-size:.85rem;
+      font-weight:500
+    }
+
+    .divider::before,.divider::after{
+      content:'';
+      flex:1;
+      height:1.5px;
+      background:linear-gradient(90deg,transparent,var(--br),transparent)
+    }
+
+    /* ============= FORM GROUPS ============= */
+    .form-group{
+      margin-bottom:20px;
+      animation:fadeInUp .6s ease-out
+    }
+
+    .form-group:nth-child(1){animation-delay:.1s}
+    .form-group:nth-child(2){animation-delay:.2s}
+    .form-group:nth-child(3){animation-delay:.3s}
+
+    .form-label{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      font-size:.85rem;
+      font-weight:600;
+      color:var(--tm);
+      margin-bottom:8px;
+      text-transform:uppercase;
+      letter-spacing:.5px
+    }
+
+    .label-text{
+      display:flex;
+      align-items:center;
+      gap:6px
+    }
+
+    .label-required{
+      color:var(--error);
+      font-size:1rem
+    }
+
+    .form-input{
+      width:100%;
+      background:linear-gradient(135deg,var(--off),var(--gp));
+      border:2px solid var(--br);
+      border-radius:12px;
+      padding:14px 16px;
+      color:var(--td);
+      font-family:'Outfit',sans-serif;
+      font-size:.95rem;
+      outline:none;
+      transition:all .3s cubic-bezier(.34,1.56,.64,1);
+      position:relative;
+    }
+
+    .form-input::placeholder{
+      color:#b0c9bb
+    }
+
+    .form-input:focus{
+      border-color:var(--gb);
+      background:white;
+      box-shadow:0 0 0 4px rgba(0,201,107,.1),0 8px 24px rgba(0,201,107,.15);
+      transform:translateY(-2px);
+    }
+
+    .form-input.error{
+      border-color:var(--error);
+      box-shadow:0 0 0 4px rgba(239,68,68,.1)
+    }
+
+    .form-input:autofill,
+    .form-input:-webkit-autofill{
+      -webkit-box-shadow:0 0 0 1000px white inset !important;
+      caret-color:var(--gb)
+    }
+
+    /* ============= PASSWORD TOGGLE ============= */
+    .password-group{
+      position:relative
+    }
+
+    .password-toggle{
+      position:absolute;
+      right:14px;
+      top:50%;
+      transform:translateY(-50%);
+      background:none;
+      border:none;
+      cursor:pointer;
+      color:var(--ts);
+      font-size:.85rem;
+      font-weight:600;
+      transition:all .2s;
+      width:32px;
+      height:32px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .password-toggle:hover{
+      color:var(--gm);
+      transform:translateY(-50%) scale(1.15)
+    }
+
+    .password-toggle i{
+      font-size:1.1rem
+    }
+
+    /* ============= REMEMBER & CHECKBOX ============= */
+    .remember-section{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:24px;
+      font-size:.9rem;
+      color:var(--ts);
+    }
+
+    .custom-checkbox{
+      width:18px;
+      height:18px;
+      border:2px solid var(--br);
+      border-radius:6px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all .3s;
+      background:white;
+      position:relative;
+      flex-shrink:0
+    }
+
+    .custom-checkbox:hover{
+      border-color:var(--gb);
+      box-shadow:0 0 8px rgba(0,201,107,.2)
+    }
+
+    input[type="checkbox"]{
+      display:none
+    }
+
+    input[type="checkbox"]:checked + .custom-checkbox{
+      background:linear-gradient(135deg,var(--gb),var(--gg));
+      border-color:var(--gb);
+      box-shadow:0 4px 12px rgba(0,201,107,.3)
+    }
+
+    input[type="checkbox"]:checked + .custom-checkbox::after{
+      content:'✓';
+      color:white;
+      font-size:12px;
+      font-weight:700;
+      animation:checkPop .4s cubic-bezier(.34,1.56,.64,1)
+    }
+
+    @keyframes checkPop{
+      0%{transform:scale(0) rotate(-45deg)}
+      100%{transform:scale(1) rotate(0)}
+    }
+
+    /* ============= BUTTONS ============= */
+    .btn-main{
+      width:100%;
+      padding:15px;
+      border:none;
+      border-radius:12px;
+      background:linear-gradient(135deg,var(--gm),var(--gd));
+      color:white;
+      font-family:'Clash Display',sans-serif;
+      font-size:1rem;
+      font-weight:700;
+      cursor:pointer;
+      transition:all .3s cubic-bezier(.34,1.56,.64,1);
+      box-shadow:0 6px 24px rgba(10,124,68,.3);
+      position:relative;
+      overflow:hidden;
+      margin-bottom:16px;
+      text-transform:uppercase;
+      letter-spacing:1px
+    }
+
+    .btn-main::before{
+      content:'';
+      position:absolute;
+      inset:0;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);
+      transform:translateX(-100%);
+      transition:transform .6s
+    }
+
+    .btn-main:hover{
+      transform:translateY(-4px);
+      box-shadow:0 12px 40px rgba(10,124,68,.4)
+    }
+
+    .btn-main:hover::before{
+      transform:translateX(100%)
+    }
+
+    .btn-main:active{
+      transform:translateY(-2px)
+    }
+
+    .btn-main:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+      transform:none
+    }
+
+    .btn-spinner{
+      display:inline-block;
+      width:14px;
+      height:14px;
+      border:2.5px solid rgba(255,255,255,.3);
+      border-top-color:white;
+      border-radius:50%;
+      animation:spin .6s linear infinite;
+      margin-right:8px;
+      vertical-align:middle
+    }
+
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* ============= ERROR & SUCCESS MESSAGES ============= */
+    .alert-box{
+      padding:14px 16px;
+      border-radius:12px;
+      font-size:.9rem;
+      font-weight:500;
+      margin-bottom:20px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      animation:slideDown .3s ease-out;
+      border:2px solid;
+    }
+
+    @keyframes slideDown{
+      from{opacity:0;transform:translateY(-20px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+
+    .alert-error{
+      background:#fef2f2;
+      border-color:#fecaca;
+      color:var(--error)
+    }
+
+    .alert-success{
+      background:#f0fdf4;
+      border-color:#bbf7d0;
+      color:var(--success)
+    }
+
+    .alert-info{
+      background:#f0f9ff;
+      border-color:#bae6fd;
+      color:var(--accent-blue)
+    }
+
+    .alert-hidden{
+      display:none
+    }
+
+    /* ============= LINKS ============= */
+    .footer-links{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:20px;
+      font-size:.85rem;
+      gap:12px;
+      flex-wrap:wrap
+    }
+
+    .footer-links a{
+      color:var(--gm);
+      font-weight:600;
+      text-decoration:none;
+      transition:all .3s;
+      position:relative;
+    }
+
+    .footer-links a::after{
+      content:'';
+      position:absolute;
+      bottom:-3px;
+      left:0;
+      width:0;
+      height:2px;
+      background:linear-gradient(90deg,var(--gb),var(--gg));
+      transition:width .3s;
+    }
+
+    .footer-links a:hover::after{
+      width:100%
+    }
+
+    .sign-up-link{
+      text-align:center;
+      margin-top:24px;
+      padding-top:24px;
+      border-top:1px solid var(--br);
+      color:var(--ts);
+      font-size:.9rem;
+    }
+
+    .sign-up-link a{
+      color:var(--gm);
+      font-weight:700;
+      text-decoration:none;
+      transition:all .3s
+    }
+
+    .sign-up-link a:hover{
+      color:var(--gb);
+      transform:translateY(-2px)
+    }
+
+    /* ============= TOAST NOTIFICATIONS ============= */
+    .toast{
+      position:fixed;
+      bottom:30px;
+      left:50%;
+      transform:translateX(-50%) translateY(120px);
+      padding:14px 24px;
+      border-radius:12px;
+      font-size:.9rem;
+      font-weight:600;
+      z-index:9999;
+      opacity:0;
+      transition:all .4s cubic-bezier(.34,1.56,.64,1);
+      max-width:90vw;
+      min-width:280px;
+      box-shadow:0 8px 32px rgba(0,0,0,.2);
+      backdrop-filter:blur(10px);
+      border:1px solid rgba(255,255,255,.2)
+    }
+
+    .toast.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(0)
+    }
+
+    .toast-success{
+      background:linear-gradient(135deg,rgba(34,197,94,.95),rgba(16,185,129,.95));
+      color:white;
+      border-color:rgba(34,197,94,.3)
+    }
+
+    .toast-error{
+      background:linear-gradient(135deg,rgba(239,68,68,.95),rgba(220,38,38,.95));
+      color:white;
+      border-color:rgba(239,68,68,.3)
+    }
+
+    .toast-info{
+      background:linear-gradient(135deg,rgba(59,130,246,.95),rgba(37,99,235,.95));
+      color:white;
+      border-color:rgba(59,130,246,.3)
+    }
+
+    /* ============= LOADING STATE ============= */
+    .is-loading{
+      pointer-events:none;
+      opacity:.7
+    }
+
+    /* ============= ANIMATIONS ============= */
+    @keyframes slideInLeft{
+      from{opacity:0;transform:translateX(-50px)}
+      to{opacity:1;transform:translateX(0)}
+    }
+
+    @keyframes slideInRight{
+      from{opacity:0;transform:translateX(50px)}
+      to{opacity:1;transform:translateX(0)}
+    }
+
+    @keyframes fadeInUp{
+      from{opacity:0;transform:translateY(20px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+
+    /* ============= RESPONSIVE ============= */
+    @media (max-width:768px){
+      .left-section{
+        padding:20px
+      }
+
+      .tagline{
+        font-size:2rem
+      }
+
+      .tagline-desc{
+        font-size:.95rem
+      }
+
+      .card{
+        padding:32px 24px
+      }
+
+      .card-title{
+        font-size:1.5rem
+      }
+
+      .features{
+        gap:12px
+      }
+
+      .feature-item{
+        padding:12px
+      }
+
+      .footer-links{
+        flex-direction:column;
+        gap:8px;
+        align-items:flex-start
+      }
+
+      .footer-links a{
+        width:100%
+      }
+    }
+
+    @media (max-width:480px){
+      html,body{
+        padding:12px
+      }
+
+      .card{
+        padding:24px
+      }
+
+      .card-title{
+        font-size:1.3rem
+      }
+
+      .tagline{
+        font-size:1.5rem
+      }
+
+      .btn-main{
+        padding:12px;
+        font-size:.9rem
+      }
+
+      .form-group{
+        margin-bottom:16px
+      }
+    }
   </style>
 </head>
 <body>
+
+<!-- ANIMATED BACKGROUND -->
+<div class="animated-bg">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
 <canvas id="c"></canvas>
 
+<!-- MAIN WRAPPER -->
 <div class="wrap">
-  <a href="/" class="logo"><div class="ld"></div><span class="logo-t">NextGen<span>Growth</span></span></a>
+  
+  <!-- LEFT SECTION: BRANDING & FEATURES -->
+  <div class="left-section">
+    <a href="/" class="logo">
+      <div class="logo-dot"></div>
+      <span class="logo-text">NextGen<span>Growth</span></span>
+    </a>
 
-  <div class="card">
-    <div class="card-title">Welcome Back 👋</div>
-    <div class="card-sub">Login to your NextGenGrowth account.</div>
-
-    <!-- Google Sign In -->
-    <button class="google-btn" onclick="window.location.href='/auth/google?role='+document.querySelector('.role-btn.active').dataset.role">
-      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-      Continue with Google
-    </button>
-
-    <div class="divider">or login with email</div>
-
-    <!-- Role Toggle -->
-    <div class="role-toggle">
-      <button class="role-btn active" data-role="student" onclick="setRole(this)">🎓 Student</button>
-      <button class="role-btn" data-role="brand" onclick="setRole(this)">🏢 Brand</button>
+    <div>
+      <h1 class="tagline">Hire Talent.<br/>Learn. Earn. Grow.</h1>
+      <p class="tagline-desc">Connect with creative talents or unlock paid opportunities while learning real-world skills.</p>
     </div>
 
-    <div class="err-box" id="errBox">Invalid email or password.</div>
-
-    <div class="fg">
-      <label>Email Address</label>
-      <input class="fi" type="email" id="loginEmail" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doLogin()"/>
-    </div>
-    <div class="fg">
-      <label>Password</label>
-      <div class="pass-wrap">
-        <input class="fi" type="password" id="loginPass" placeholder="Your password" onkeydown="if(event.key==='Enter')doLogin()"/>
-        <button class="show-pass" onclick="togglePass()">Show</button>
+    <div class="features">
+      <div class="feature-item">
+        <div class="feature-icon">💼</div>
+        <div class="feature-text">
+          <div class="feature-title">For Brands</div>
+          <div class="feature-desc">Hire pre-vetted creative talents for your campaigns</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🎓</div>
+        <div class="feature-text">
+          <div class="feature-title">For Students</div>
+          <div class="feature-desc">Gain experience and earn money with real projects</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🚀</div>
+        <div class="feature-text">
+          <div class="feature-title">Fast & Secure</div>
+          <div class="feature-desc">Quick onboarding with trusted authentication</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">✨</div>
+        <div class="feature-text">
+          <div class="feature-title">Community</div>
+          <div class="feature-desc">Join thousands of creators and brands worldwide</div>
+        </div>
       </div>
     </div>
+  </div>
 
-    <button class="btn-main" id="loginBtn" onclick="doLogin()">Login →</button>
+  <!-- RIGHT SECTION: LOGIN CARD -->
+  <div class="right-section">
+    <div class="card">
+      <div class="card-content">
+        
+        <div class="card-header">
+          <h2 class="card-title">Welcome Back 👋</h2>
+          <p class="card-sub">Log in to your NextGenGrowth account</p>
+        </div>
 
-    <div class="links">
-      <a href="/register">Create account →</a>
-      <a href="#" onclick="showToast('Password reset coming soon!','info');return false">Forgot password?</a>
+        <!-- ALERT MESSAGES -->
+        <div class="alert-box alert-hidden" id="alertBox">
+          <i class="fas fa-circle-exclamation"></i>
+          <span id="alertText"></span>
+        </div>
+
+        <!-- ROLE TOGGLE -->
+        <div class="role-toggle">
+          <button class="role-btn active" data-role="student" onclick="setRole(this)">
+            <span>🎓</span> Student
+          </button>
+          <button class="role-btn" data-role="brand" onclick="setRole(this)">
+            <span>🏢</span> Brand
+          </button>
+        </div>
+
+        <!-- OAUTH SECTION -->
+        <div class="oauth-section">
+          <button class="google-btn" onclick="handleGoogleLogin()" id="googleBtn">
+            <svg class="google-icon" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Continue with Google
+          </button>
+        </div>
+
+        <div class="divider">or login with email</div>
+
+        <!-- LOGIN FORM -->
+        <form id="loginForm" onsubmit="handleLoginSubmit(event)">
+          
+          <!-- EMAIL FIELD -->
+          <div class="form-group">
+            <label class="form-label">
+              <span class="label-text">
+                <i class="fas fa-envelope"></i>
+                Email Address
+                <span class="label-required">*</span>
+              </span>
+            </label>
+            <input 
+              type="email" 
+              class="form-input" 
+              id="loginEmail" 
+              placeholder="you@example.com"
+              required
+              autocomplete="email"
+            />
+          </div>
+
+          <!-- PASSWORD FIELD -->
+          <div class="form-group">
+            <label class="form-label">
+              <span class="label-text">
+                <i class="fas fa-lock"></i>
+                Password
+                <span class="label-required">*</span>
+              </span>
+              <span style="font-size:.75rem;color:var(--gm);font-weight:500">Need help?</span>
+            </label>
+            <div class="password-group">
+              <input 
+                type="password" 
+                class="form-input" 
+                id="loginPass" 
+                placeholder="••••••••••"
+                required
+                autocomplete="current-password"
+              />
+              <button 
+                type="button" 
+                class="password-toggle" 
+                onclick="togglePasswordVisibility()"
+                id="passToggleBtn"
+              >
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- REMEMBER ME -->
+          <div class="remember-section">
+            <input type="checkbox" id="rememberMe" />
+            <label class="custom-checkbox" for="rememberMe"></label>
+            <span style="margin-left:8px">Remember me for 30 days</span>
+          </div>
+
+          <!-- LOGIN BUTTON -->
+          <button type="submit" class="btn-main" id="loginBtn">
+            <span id="btnText">Login →</span>
+          </button>
+
+        </form>
+
+        <!-- FOOTER LINKS -->
+        <div class="footer-links">
+          <a href="#" onclick="handleForgotPassword(event)">
+            <i class="fas fa-question-circle"></i> Forgot Password?
+          </a>
+          <a href="#" onclick="handleNeedHelp(event)">
+            <i class="fas fa-headset"></i> Need Help?
+          </a>
+        </div>
+
+        <!-- SIGN UP LINK -->
+        <div class="sign-up-link">
+          Don't have an account? 
+          <a href="/register">Create one now →</a>
+        </div>
+
+      </div>
     </div>
   </div>
+
 </div>
 
-<div class="toast" id="toast" style="position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);padding:11px 20px;border-radius:100px;font-size:.83rem;font-weight:500;z-index:999;opacity:0;white-space:nowrap;transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .3s;max-width:90vw"></div>
+<!-- TOAST NOTIFICATION -->
+<div class="toast" id="toast"></div>
 
+<!-- SCRIPTS -->
 <script>
-// Particles
-(function(){
-  const c=document.getElementById('c');const ctx=c.getContext('2d');
-  let w,h,pts=[];
-  function resize(){c.width=w=window.innerWidth;c.height=h=window.innerHeight;}
-  resize();window.addEventListener('resize',resize);
-  for(let i=0;i<60;i++)pts.push({x:Math.random()*1920,y:Math.random()*1080,r:Math.random()*1.2+.3,vx:(Math.random()-.5)*.2,vy:(Math.random()-.5)*.2,a:Math.random()*Math.PI*2});
-  function draw(){
-    ctx.clearRect(0,0,w,h);
-    pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.a+=.005;if(p.x<0||p.x>w)p.vx*=-1;if(p.y<0||p.y>h)p.vy*=-1;
-      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(0,255,136,${.12+.06*Math.sin(p.a)})`;ctx.fill();});
-    requestAnimationFrame(draw);
-  }draw();
-})();
-
-function setRole(btn){
-  document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-}
-
-function togglePass(){
-  const inp=document.getElementById('loginPass');
-  inp.type=inp.type==='password'?'text':'password';
-}
-
-async function doLogin(){
-  const email=document.getElementById('loginEmail').value.trim();
-  const pass=document.getElementById('loginPass').value;
-  const role=document.querySelector('.role-btn.active').dataset.role;
-  const errBox=document.getElementById('errBox');
-  errBox.classList.remove('show');
-  if(!email||!pass){errBox.textContent='Enter email and password.';errBox.classList.add('show');return;}
-  const btn=document.getElementById('loginBtn');
-  btn.innerHTML='<span class="spin"></span>Logging in...';btn.disabled=true;
-  try{
-    const res=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass,role})});
-    const data=await res.json();
-    if(data.success){
-      localStorage.setItem('ngg_token',data.token);
-      localStorage.setItem('ngg_user',JSON.stringify(data.user));
-      gsap.to('.card',{scale:.97,opacity:0,duration:.3,onComplete:()=>{
-        window.location.href=data.user.role==='brand'?'/brand-dashboard':'/dashboard';
-      }});
-    }else{
-      errBox.textContent=data.message||'Invalid credentials.';errBox.classList.add('show');
-      gsap.fromTo('.card',{x:-8},{x:0,duration:.07,repeat:4,yoyo:true,ease:'none'});
+  // ==================== PARTICLE ANIMATION ====================
+  (function() {
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+    let w, h, particles = [];
+    
+    function resize() {
+      canvas.width = w = window.innerWidth;
+      canvas.height = h = window.innerHeight;
     }
-  }catch{errBox.textContent='Server error. Check connection.';errBox.classList.add('show');}
-  btn.innerHTML='Login →';btn.disabled=false;
-}
+    
+    resize();
+    window.addEventListener('resize', resize);
+    
+    for (let i = 0; i < 80; i++) {
+      particles.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: Math.random() * 1.5 + 0.5,
+        vx: (Math.random() - 0.5) * 0.15,
+        vy: (Math.random() - 0.5) * 0.15,
+        a: Math.random() * Math.PI * 2,
+        opacity: Math.random() * 0.5 + 0.3
+      });
+    }
+    
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
+      
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.a += 0.005;
+        
+        if (p.x < 0 || p.x > w) p.vx *= -1;
+        if (p.y < 0 || p.y > h) p.vy *= -1;
+        
+        const alpha = p.opacity + 0.1 * Math.sin(p.a);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0,255,136,${Math.max(0, alpha)})`;
+        ctx.fill();
+      });
+      
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
 
-function showToast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.style.background=type==='info'?'#0a1f12':'#064e2b';t.style.color='white';t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(-50%) translateY(80px)';},3000);}
+  // ==================== STATE MANAGEMENT ====================
+  let currentRole = 'student';
+  let isLoading = false;
 
-window.addEventListener('DOMContentLoaded',()=>{
-  gsap.from('.card',{y:30,opacity:0,duration:.7,ease:'power3.out'});
-  gsap.from('.logo',{y:-10,opacity:0,duration:.5});
-  // Check for error in URL
-  const p=new URLSearchParams(location.search);
-  if(p.get('error')){document.getElementById('errBox').textContent='Google login failed. Try again.';document.getElementById('errBox').classList.add('show');}
-});
+  // ==================== UTILITY FUNCTIONS ====================
+  function setRole(btn) {
+    document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentRole = btn.dataset.role;
+    
+    gsap.from(btn, {
+      scale: 0.9,
+      duration: 0.3,
+      ease: 'back.out'
+    });
+  }
+
+  function togglePasswordVisibility() {
+    const input = document.getElementById('loginPass');
+    const btn = document.getElementById('passToggleBtn');
+    const isPassword = input.type === 'password';
+    
+    input.type = isPassword ? 'text' : 'password';
+    btn.innerHTML = isPassword ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+    
+    gsap.from(btn, {
+      scale: 1.2,
+      duration: 0.2,
+      ease: 'back.out'
+    });
+  }
+
+  function showAlert(message, type = 'error') {
+    const alertBox = document.getElementById('alertBox');
+    const alertText = document.getElementById('alertText');
+    
+    alertText.textContent = message;
+    alertBox.className = `alert-box alert-${type}`;
+    
+    gsap.from(alertBox, {
+      opacity: 0,
+      y: -20,
+      duration: 0.4,
+      ease: 'power2.out'
+    });
+    
+    setTimeout(() => {
+      gsap.to(alertBox, {
+        opacity: 0,
+        y: -20,
+        duration: 0.3,
+        ease: 'power2.in',
+        onComplete: () => alertBox.classList.add('alert-hidden')
+      });
+    }, 4000);
+  }
+
+  function showToast(message, type = 'info') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = `toast toast-${type} show`;
+    
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3500);
+  }
+
+  function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  }
+
+  function validatePassword(password) {
+    return password && password.length >= 6;
+  }
+
+  // ==================== FORM HANDLING ====================
+  async function handleLoginSubmit(event) {
+    event.preventDefault();
+    
+    if (isLoading) return;
+    
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPass').value;
+    const alertBox = document.getElementById('alertBox');
+    
+    alertBox.classList.add('alert-hidden');
+    
+    // Validation
+    if (!email) {
+      showAlert('Please enter your email address', 'error');
+      document.getElementById('loginEmail').classList.add('error');
+      gsap.fromTo('.card', { x: -10 }, { x: 0, duration: 0.1, repeat: 3, yoyo: true });
+      return;
+    }
+    
+    if (!validateEmail(email)) {
+      showAlert('Please enter a valid email address', 'error');
+      document.getElementById('loginEmail').classList.add('error');
+      return;
+    }
+    
+    if (!password) {
+      showAlert('Please enter your password', 'error');
+      document.getElementById('loginPass').classList.add('error');
+      gsap.fromTo('.card', { x: -10 }, { x: 0, duration: 0.1, repeat: 3, yoyo: true });
+      return;
+    }
+    
+    if (!validatePassword(password)) {
+      showAlert('Password must be at least 6 characters', 'error');
+      document.getElementById('loginPass').classList.add('error');
+      return;
+    }
+    
+    // Clear error states
+    document.getElementById('loginEmail').classList.remove('error');
+    document.getElementById('loginPass').classList.remove('error');
+    
+    // Set loading state
+    isLoading = true;
+    const loginBtn = document.getElementById('loginBtn');
+    const btnText = document.getElementById('btnText');
+    
+    loginBtn.disabled = true;
+    btnText.innerHTML = '<span class="btn-spinner"></span>Logging in...';
+    
+    try {
+      // API Call
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          role: currentRole
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        // Success animation
+        showToast('🎉 Login successful! Redirecting...', 'success');
+        
+        // Store credentials
+        localStorage.setItem('ngg_token', data.token);
+        localStorage.setItem('ngg_user', JSON.stringify(data.user));
+        localStorage.setItem('ngg_role', currentRole);
+        
+        // Animate out
+        gsap.to('.card', {
+          scale: 0.95,
+          opacity: 0,
+          duration: 0.5,
+          ease: 'power2.in',
+          onComplete: () => {
+            window.location.href = currentRole === 'brand' ? '/brand-dashboard' : '/dashboard';
+          }
+        });
+      } else {
+        // Error response
+        showAlert(data.message || 'Invalid email or password', 'error');
+        
+        // Shake animation
+        gsap.fromTo('.card', 
+          { x: -8 }, 
+          { x: 0, duration: 0.07, repeat: 4, yoyo: true, ease: 'none' }
+        );
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      showAlert('Server error. Please check your connection and try again.', 'error');
+      
+      gsap.fromTo('.card', 
+        { x: -8 }, 
+        { x: 0, duration: 0.07, repeat: 4, yoyo: true, ease: 'none' }
+      );
+    } finally {
+      isLoading = false;
+      loginBtn.disabled = false;
+      btnText.innerHTML = 'Login →';
+    }
+  }
+
+  function handleGoogleLogin() {
+    const googleBtn = document.getElementById('googleBtn');
+    googleBtn.disabled = true;
+    
+    gsap.to(googleBtn, {
+      scale: 0.98,
+      duration: 0.2
+    });
+    
+    showToast('Redirecting to Google...', 'info');
+    
+    // Redirect to OAuth endpoint
+    window.location.href = `/auth/google?role=${currentRole}`;
+  }
+
+  function handleForgotPassword(event) {
+    event.preventDefault();
+    showToast('Password reset coming soon! Check back later.', 'info');
+    
+    // Animation for button
+    gsap.to(event.target, {
+      scale: 1.05,
+      duration: 0.2,
+      yoyo: true,
+      repeat: 1
+    });
+  }
+
+  function handleNeedHelp(event) {
+    event.preventDefault();
+    
+    const supportOptions = `
+      📧 Email: support@nextgengrowth.com
+      💬 Live Chat: Available 9 AM - 6 PM IST
+      📚 Help Center: /help
+    `;
+    
+    showToast('Support team standing by!', 'info');
+  }
+
+  // ==================== INPUT VALIDATION LISTENERS ====================
+  document.getElementById('loginEmail').addEventListener('input', function() {
+    this.classList.remove('error');
+  });
+
+  document.getElementById('loginPass').addEventListener('input', function() {
+    this.classList.remove('error');
+  });
+
+  document.getElementById('loginEmail').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      document.getElementById('loginPass').focus();
+    }
+  });
+
+  document.getElementById('loginPass').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+    }
+  });
+
+  // ==================== PAGE LOAD ANIMATIONS ====================
+  window.addEventListener('DOMContentLoaded', function() {
+    // Check for URL error parameters
+    const params = new URLSearchParams(location.search);
+    if (params.get('error')) {
+      showAlert('Google login failed. Please try again or use email login.', 'error');
+    }
+    
+    // Initial animations
+    gsap.from('.card', {
+      y: 40,
+      opacity: 0,
+      duration: 0.8,
+      ease: 'power3.out'
+    });
+
+    gsap.from('.logo', {
+      y: -20,
+      opacity: 0,
+      duration: 0.6,
+      delay: 0.2
+    });
+
+    gsap.from('.tagline', {
+      y: 30,
+      opacity: 0,
+      duration: 0.7,
+      delay: 0.3,
+      ease: 'power3.out'
+    });
+
+    gsap.from('.feature-item', {
+      y: 20,
+      opacity: 0,
+      duration: 0.5,
+      stagger: 0.1,
+      delay: 0.4,
+      ease: 'power2.out'
+    });
+
+    // Hover effects
+    document.querySelectorAll('.form-input').forEach(input => {
+      input.addEventListener('focus', function() {
+        gsap.to(this, {
+          duration: 0.3,
+          ease: 'power2.out'
+        });
+      });
+    });
+  });
+
+  // ==================== REMEMBER ME FUNCTIONALITY ====================
+  const rememberMe = document.getElementById('rememberMe');
+  const loginEmail = document.getElementById('loginEmail');
+
+  // Check if there's a saved email
+  window.addEventListener('load', function() {
+    const savedEmail = localStorage.getItem('ngg_saved_email');
+    if (savedEmail) {
+      loginEmail.value = savedEmail;
+      rememberMe.checked = true;
+    }
+  });
+
+  // Save email if remember me is checked
+  document.getElementById('loginForm').addEventListener('submit', function() {
+    if (rememberMe.checked) {
+      localStorage.setItem('ngg_saved_email', loginEmail.value);
+    } else {
+      localStorage.removeItem('ngg_saved_email');
+    }
+  });
+
+  // ==================== SMOOTH SCROLL & MOBILE SUPPORT ====================
+  if (window.innerWidth <= 768) {
+    document.body.style.minHeight = '100vh';
+  }
+
+  window.addEventListener('resize', function() {
+    if (window.innerWidth <= 768) {
+      document.body.style.minHeight = '100vh';
+    }
+  });
 </script>
+
 </body>
 </html>
