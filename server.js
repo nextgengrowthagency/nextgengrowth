@@ -110,7 +110,7 @@ async function sendEmail(to, subject, html) {
     const { data, error } = await resend.emails.send({
       // DHYAN DE: Jab tak Resend me domain verify nahi hota, 
       // yahan 'onboarding@resend.dev' hi rahega aur OTP sirf tere account wale email par hi jayega.
-      from: 'NextGenGrowth <onboarding@resend.dev>', 
+     from: 'NextGenGrowth <team@nextgengrowth.in>', // 'team' ki jagah 'support' ya 'hello' bhi likh sakte ho 
       to: [to],
       subject: subject,
       html: html,
