@@ -98,15 +98,15 @@ console.log("✅ All models loaded!");
 // ═══════════════════════════════════════════
 // EMAIL
 // ═══════════════════════════════════════════
+
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,             // ✅ Port changed to 465
-  secure: true,          // ✅ Secure true for 465
+  service: "gmail", // host aur port hata kar direct service use karo
   auth: {
     user: GMAIL_USER,
     pass: GMAIL_PASS
   }
 });
+
 transporter.verify((err)=>{
   if(err)console.log("⚠️ Email not connected:",err.message);
   else console.log("✅ Email ready!");
