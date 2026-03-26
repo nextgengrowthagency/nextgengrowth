@@ -100,9 +100,8 @@ console.log("✅ All models loaded!");
 // ═══════════════════════════════════════════
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  requireTLS: true,
+  port: 465,             // ✅ Port changed to 465
+  secure: true,          // ✅ Secure true for 465
   auth: {
     user: GMAIL_USER,
     pass: GMAIL_PASS
@@ -117,7 +116,10 @@ async function sendEmail(to,subject,html){
   try{
     await transporter.sendMail({from:`"NextGenGrowth" <${GMAIL_USER}>`,to,subject,html});
     console.log(`📧 Email sent: ${to}`);
-  }catch(err){console.error("❌ Email error:",err.message);}
+  }catch(err){
+    console.error("❌ Email error:",err.message);
+    throw err; // ✅ FIXED: Ab ye error chupayega nahi, API ko batayega ki fail hua hai!
+  }
 }
 
 // OTP Email template
