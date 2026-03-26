@@ -388,6 +388,14 @@ select.fi option{background:var(--bg2)}
         <span class="ni-txt">Dashboard</span>
       </button>
       <div class="nl">Manage</div>
+
+      <!-- ✅ BRAND APPROVALS TAB ADDED HERE -->
+      <button class="ni" onclick="goTo('approvals',this)">
+        <svg class="ni-ico" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        <span class="ni-txt">Pending Brands</span>
+        <span class="nb" id="nbPending" style="background:var(--red);display:none">0</span>
+      </button>
+
       <button class="ni" onclick="goTo('users',this)">
         <svg class="ni-ico" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
         <span class="ni-txt">Users</span>
@@ -519,13 +527,24 @@ select.fi option{background:var(--bg2)}
         </div>
       </div>
 
+      <!-- ✅ NEW: APPROVALS PAGE -->
+      <div class="page" id="page-approvals">
+        <div class="ph"><h2>Brand Approvals 🛡️</h2><p>Review and approve new brand registrations.</p></div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Brand / Company</th><th>Contact Person</th><th>Website/Link</th><th>Joined Date</th><th>Action</th></tr></thead>
+            <tbody id="approvalsTable"><tr><td colspan="5" style="text-align:center;padding:30px;color:var(--muted)">Loading pending brands...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- USERS -->
       <div class="page" id="page-users">
-        <div class="ph"><h2>User Management 👥</h2><p>All students and brands registered on the platform.</p></div>
+        <div class="ph"><h2>User Management 👥</h2><p>All students and approved brands registered on the platform.</p></div>
         <div class="g3" style="margin-bottom:20px">
           <div class="sc"><div class="sc-top"><div class="sc-ico ico-g">👥</div></div><span class="sc-num" id="uTotal">—</span><div class="sc-lbl">Total Users</div></div>
           <div class="sc"><div class="sc-top"><div class="sc-ico ico-b">🎓</div></div><span class="sc-num" id="uStudents">—</span><div class="sc-lbl">Students</div></div>
-          <div class="sc"><div class="sc-top"><div class="sc-ico ico-p">🏢</div></div><span class="sc-num" id="uBrands">—</span><div class="sc-lbl">Brands</div></div>
+          <div class="sc"><div class="sc-top"><div class="sc-ico ico-p">🏢</div></div><span class="sc-num" id="uBrands">—</span><div class="sc-lbl">Approved Brands</div></div>
         </div>
         <div class="search-row">
           <div class="srch"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg><input type="text" placeholder="Search by name, email, college..." id="userSearch" oninput="filterUsers(this.value)"/></div>
@@ -689,7 +708,7 @@ select.fi option{background:var(--bg2)}
 <script>
 // ════ STATE ════
 let _tok = localStorage.getItem('ngg_admin_token');
-let allUsers=[], allProjects=[], allApps=[], allTxs=[];
+let allUsers=[], pendingBrands=[], allProjects=[], allApps=[], allTxs=[];
 let pendingAction=null;
 let curUserRole='all', curUserSearch='', curAppFilter='all';
 
@@ -794,7 +813,7 @@ async function loadStats(){
     const s=data.stats;
     // Animate counters
     animN('sTotal',s.totalUsers);animN('sStudents',s.totalStudents);animN('sBrands',s.totalBrands);
-    animN('sProjects',s.totalProjects);animN('uTotal',s.totalUsers);animN('uStudents',s.totalStudents);animN('uBrands',s.totalBrands);
+    animN('sProjects',s.totalProjects);animN('uTotal',s.totalUsers);animN('uStudents',s.totalStudents);
     animN('pjTotal',s.totalProjects);animN('pjOpen',s.openProjects);
     animN('apTotal',s.totalApps);animN('apReview',s.totalApps-s.acceptedApps);animN('apAccepted',s.acceptedApps);
     document.getElementById('sRevenue').textContent='₹'+(s.totalEarnings||0).toLocaleString('en-IN');
@@ -816,12 +835,31 @@ function animN(id,val){
   gsap.fromTo({n:0},{n:val},{duration:1.4,ease:'power2.out',onUpdate(){el.textContent=Math.round(this.targets()[0].n).toLocaleString();}});
 }
 
-// ════ USERS ════
+// ════ USERS & APPROVALS ════
 async function loadUsers(){
   try{
     const data=await fetch('/api/admin/users',{headers:H()}).then(r=>r.json());
     if(!data.success)return;
-    allUsers=data.users;renderUsers();renderDashUsers(allUsers.slice(0,6));
+    
+    // Separate verified users vs pending brands
+    allUsers = data.users.filter(u => u.isApproved !== false || u.role !== 'brand');
+    pendingBrands = data.users.filter(u => u.role === 'brand' && u.isApproved === false);
+    
+    // Update Pending Badge in Sidebar
+    const nbP = document.getElementById('nbPending');
+    if(pendingBrands.length > 0) {
+      nbP.textContent = pendingBrands.length;
+      nbP.style.display = 'inline-block';
+    } else {
+      nbP.style.display = 'none';
+    }
+    
+    // Update Stats text
+    animN('uBrands', allUsers.filter(u => u.role === 'brand').length);
+
+    renderUsers();
+    renderDashUsers(allUsers.slice(0,6));
+    renderApprovals();
   }catch(e){}
 }
 
@@ -859,6 +897,35 @@ function renderUsers(){
       <td><button class="btn bdan bsm" onclick="showConfirm('user','${u._id||u.id}','${u.firstName} ${u.lastName}')">🗑 Delete</button></td>
     </tr>`;
   }).join('');
+}
+
+function renderApprovals() {
+  const el=document.getElementById('approvalsTable');
+  if(!pendingBrands.length){el.innerHTML='<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--muted)">No pending approvals 🎉</td></tr>';return;}
+  el.innerHTML=pendingBrands.map(u=>{
+    const ini=((u.firstName||'?')[0]+(u.lastName||'')[0]).toUpperCase();
+    const link = u.brandLink ? `<a href="${u.brandLink}" target="_blank" style="color:var(--gb);text-decoration:none;font-weight:600"><i class="fas fa-external-link-alt"></i> View Link</a>` : '<span style="color:var(--muted)">No Link Provided</span>';
+    return`<tr>
+      <td><div style="font-weight:600;font-size:.85rem;color:var(--white)">${u.companyName||'—'}</div></td>
+      <td><div class="user-cell"><div class="u-av">${ini}</div><div><div class="u-name">${u.firstName} ${u.lastName}</div><div class="u-email">${u.email}</div></div></div></td>
+      <td>${link}</td>
+      <td style="font-size:.78rem;color:var(--muted)">${new Date(u.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</td>
+      <td><button class="btn bpri bsm" onclick="approveBrand('${u._id||u.id}')">✓ Approve</button></td>
+    </tr>`;
+  }).join('');
+}
+
+async function approveBrand(id) {
+  try {
+    const res = await fetch(`/api/admin/approve-brand/${id}`, {method:'PUT',headers:H()});
+    const data = await res.json();
+    if(data.success){
+      showToast('Brand Approved & Notified! ✅', 'success');
+      await loadUsers(); // Refresh tables and badge
+    } else {
+      showToast(data.message, 'error');
+    }
+  } catch(err) { showToast('Approval failed', 'error'); }
 }
 
 function filterUsers(v){curUserSearch=v.toLowerCase();renderUsers();}
@@ -1013,7 +1080,7 @@ async function doConfirm(){
 }
 
 // ════ NAVIGATION ════
-const PT={dashboard:'Dashboard',users:'User Management',projects:'Projects Management',applications:'Applications Overview',transactions:'Transactions & Revenue',settings:'Settings'};
+const PT={dashboard:'Dashboard',approvals:'Brand Approvals',users:'User Management',projects:'Projects Management',applications:'Applications Overview',transactions:'Transactions & Revenue',settings:'Settings'};
 function goTo(pg,navBtn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const el=document.getElementById('page-'+pg);if(el)el.classList.add('active');

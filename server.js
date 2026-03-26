@@ -48,6 +48,8 @@ const userSchema = new mongoose.Schema({
   googleId:{type:String,default:""},   // ✅ Google OAuth
   isVerified:{type:Boolean,default:false}, // ✅ Email verified
   avatar:{type:String,default:""},
+  brandLink: { type: String, default: "" }, // LinkedIn/Website link store karne ke liye
+  isApproved: { type: Boolean, default: false }
 },{timestamps:true});
 
 const otpSchema = new mongoose.Schema({
@@ -127,6 +129,30 @@ async function sendEmail(to, subject, html) {
     throw err;
   }
 }
+
+// ═══════════════════════════════════════════
+// BRAND VERIFICATION EMAILS (NEW)
+// ═══════════════════════════════════════════
+const brandPendingEmail = (name) => `
+  <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+    <h2>Action Required: Your Brand Verification is Under Review</h2>
+    <p>Dear ${name},</p>
+    <p>Thank you for registering with <b>NextGenGrowth</b>. We manually verify every brand profile to maintain the quality of our marketplace.</p>
+    <p>Our team is currently reviewing your application and links. This usually takes <b>24-48 hours</b>.</p>
+    <p>You will receive a confirmation email once your account is activated. Until then, project posting will be restricted.</p>
+    <p>Best Regards,<br>The NextGenGrowth Team</p>
+  </div>
+`;
+
+const brandApprovedEmail = (name) => `
+  <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+    <h2 style="color: #0a7c44;">Welcome Aboard! Your Brand Account is Approved 🎉</h2>
+    <p>Dear ${name},</p>
+    <p>Great news! Your account on <b>NextGenGrowth</b> has been successfully verified.</p>
+    <p>You now have full access to your Dashboard. You can start posting projects and hiring the best creative talent immediately.</p>
+    <p>Cheers,<br>NextGenGrowth Administration</p>
+  </div>
+`;
 
 // OTP Email template
 function otpEmailTemplate(name,otp){
@@ -298,7 +324,14 @@ if(GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET){
             isVerified:true,
           });
           const token=generateToken(newUser);
-          sendEmail(newUser.email,`Welcome to NextGenGrowth! 🎉`,welcomeEmail(newUser.firstName,role));
+          
+          // ✅ BRAND PENDING MAIL CHECK HERE
+          if (role === 'brand') {
+            sendEmail(newUser.email, "Action Required: Your Brand Verification is Under Review — NextGenGrowth", brandPendingEmail(newUser.firstName));
+          } else {
+            sendEmail(newUser.email, `Welcome to NextGenGrowth! 🎉`, welcomeEmail(newUser.firstName, role));
+          }
+
           return res.redirect(`/auth/success?token=${token}&user=${encodeURIComponent(JSON.stringify(safeUser(newUser)))}`);
         }
         const token=generateToken(u);
@@ -402,7 +435,14 @@ app.post("/api/register",authLimiter,async(req,res)=>{
     // Clean up OTP
     await OTP.deleteMany({email:email.toLowerCase()});
     const token=generateToken(newUser);
-    sendEmail(email,`Welcome to NextGenGrowth, ${firstName}! 🎉`,welcomeEmail(firstName,role));
+
+    // ✅ BRAND PENDING MAIL CHECK HERE FOR MANUAL REGISTER
+    if (role === 'brand') {
+      sendEmail(email, "Action Required: Your Brand Verification is Under Review — NextGenGrowth", brandPendingEmail(firstName));
+    } else {
+      sendEmail(email, `Welcome to NextGenGrowth, ${firstName}! 🎉`, welcomeEmail(firstName, role));
+    }
+
     console.log(`✅ Registered [${role}]: ${email}`);
     res.status(201).json({success:true,message:`Welcome, ${firstName}! 🎉`,token,user:safeUser(newUser)});
   }catch(err){
@@ -545,9 +585,16 @@ app.get("/api/brand/stats",verifyToken,async(req,res)=>{
 app.post("/api/brand/project",verifyToken,async(req,res)=>{
   try{
     if(req.user.role!=="brand")return res.status(403).json({success:false,message:"Brand only."});
+    
+    // ✅ ADMIN VERIFICATION CHECK ADDED HERE
+    const brand=await User.findById(req.user.id);
+    if(!brand.isApproved) {
+      return res.status(403).json({success:false,message:"Aapka account verification pending hai. Admin approval ke baad hi aap project post kar payenge."});
+    }
+
     const{title,description,budget,category,deadline,tags}=req.body;
     if(!title||!budget||!category)return res.status(400).json({success:false,message:"Title, budget and category required."});
-    const brand=await User.findById(req.user.id);
+    
     const brandName=brand.companyName||`${brand.firstName} ${brand.lastName}`;
     const job=await Job.create({
       brandId:req.user.id,brandName,
@@ -631,6 +678,24 @@ function adminOnly(req,res,next){
   try{const d=jwt.verify(token,JWT_SECRET);if(d.role!=="admin")return res.status(403).json({success:false,message:"Admin only."});req.admin=d;next();}
   catch{res.status(403).json({success:false,message:"Invalid token."});}
 }
+
+// ✅ NEW ADMIN API FOR APPROVING BRANDS
+app.put("/api/admin/approve-brand/:id", adminOnly, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if(!user || user.role !== 'brand') return res.status(404).json({success: false, message: "Brand not found"});
+    
+    user.isApproved = true;
+    await user.save();
+    
+    // Approval Email bhej rahe hain yahan se
+    sendEmail(user.email, "Welcome Aboard! Your Brand Account is Approved 🎉", brandApprovedEmail(user.firstName));
+    
+    res.json({success: true, message: "Brand approved and email sent!"});
+  } catch (err) {
+    res.status(500).json({success: false, message: "Server error."});
+  }
+});
 
 app.get("/api/admin/stats",adminOnly,async(req,res)=>{
   try{
