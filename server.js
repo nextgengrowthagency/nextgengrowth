@@ -99,26 +99,32 @@ console.log("✅ All models loaded!");
 // EMAIL
 // ═══════════════════════════════════════════
 
-const transporter = nodemailer.createTransport({
-  service: "gmail", // host aur port hata kar direct service use karo
-  auth: {
-    user: GMAIL_USER,
-    pass: GMAIL_PASS
-  }
-});
+// ═══════════════════════════════════════════
+// EMAIL (RESEND API)
+// ═══════════════════════════════════════════
+const { Resend } = require("resend");
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-transporter.verify((err)=>{
-  if(err)console.log("⚠️ Email not connected:",err.message);
-  else console.log("✅ Email ready!");
-});
+async function sendEmail(to, subject, html) {
+  try {
+    const { data, error } = await resend.emails.send({
+      // DHYAN DE: Jab tak Resend me domain verify nahi hota, 
+      // yahan 'onboarding@resend.dev' hi rahega aur OTP sirf tere account wale email par hi jayega.
+      from: 'NextGenGrowth <onboarding@resend.dev>', 
+      to: [to],
+      subject: subject,
+      html: html,
+    });
 
-async function sendEmail(to,subject,html){
-  try{
-    await transporter.sendMail({from:`"NextGenGrowth" <${GMAIL_USER}>`,to,subject,html});
-    console.log(`📧 Email sent: ${to}`);
-  }catch(err){
-    console.error("❌ Email error:",err.message);
-    throw err; // ✅ FIXED: Ab ye error chupayega nahi, API ko batayega ki fail hua hai!
+    if (error) {
+      console.error("❌ Resend API error:", error);
+      throw new Error(error.message);
+    }
+    
+    console.log(`📧 Email sent via Resend to: ${to}`);
+  } catch (err) {
+    console.error("❌ Email error:", err.message);
+    throw err;
   }
 }
 
