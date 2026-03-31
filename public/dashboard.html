@@ -611,8 +611,11 @@
             </div>
           </div>
           <div class="fg"><label>Bio</label><textarea class="fi" id="pbio" rows="3" placeholder="Tell brands about yourself..."></textarea></div>
-          <div class="fg"><label>LinkedIn URL</label><input class="fi" type="url" id="plink" placeholder="https://linkedin.com/in/yourname"/></div>
-          <div style="display:flex;gap:9px;flex-wrap:wrap">
+          <div class="g2">
+            <div class="fg"><label>LinkedIn URL</label><input class="fi" type="url" id="plink" placeholder="https://linkedin.com/in/yourname"/></div>
+            <div class="fg"><label>Portfolio / Drive Link</label><input class="fi" type="url" id="pportfolio" placeholder="Link to your work"/></div>
+          </div>
+          <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:10px;">
             <button class="btn bpri" id="saveBtn" onclick="saveProfile()">💾 Save Changes</button>
             <button class="btn bout" onclick="showToast('Discarded','info')">Cancel</button>
           </div>
@@ -647,7 +650,13 @@
   </nav>
 </div>
 </div>
-
+<div class="overlay" id="welcomeOverlay" style="z-index:9999"></div>
+<div class="card" id="welcomePopup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); z-index:10000; width:90%; max-width:400px; text-align:center; box-shadow:0 20px 40px rgba(0,0,0,0.2);">
+  <div style="font-size:3.5rem; margin-bottom:10px;">👋</div>
+  <h3 style="font-family:'Clash Display', sans-serif; font-size:1.5rem; color:var(--td); margin-bottom:10px;">Welcome to NextGenGrowth!</h3>
+  <p style="font-size:.95rem; color:var(--ts); margin-bottom:20px;">To get matched with the best brand projects, you need to set up your profile and add your skills.</p>
+  <button class="btn bpri" style="width:100%; justify-content:center; font-size:1rem; padding:12px;" onclick="closeWelcomePopup()">Complete My Profile →</button>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -658,21 +667,25 @@ if(!_tk||!_u){window.location.href='/login';}
 if(_u&&_u.role&&_u.role!=='student'){window.location.href='/login';}
 
 // JOBS DATA
-const ALL_JOBS=[
-  {id:1,ico:'🛍️',brand:'StyleCo India',title:'Instagram Reels Editor',cat:'video',tags:['Video Editing','Reels','Instagram'],pay:'₹2,500',days:'3-5 days',badge:'hot'},
-  {id:2,ico:'🍕',brand:'FoodieBox',title:'Social Media Post Pack (20)',cat:'design',tags:['Graphic Design','Canva','Social Media'],pay:'₹1,800',days:'2 days',badge:'new'},
-  {id:3,ico:'💻',brand:'LearnFast EdTech',title:'5 SEO Blog Articles',cat:'writing',tags:['Content Writing','SEO'],pay:'₹3,000',days:'1 week',badge:'apply'},
-  {id:4,ico:'🎵',brand:'BeatDrop Music',title:'YouTube Shorts Package (3)',cat:'video',tags:['Video Editing','YouTube','Shorts'],pay:'₹2,200',days:'4 days',badge:'new'},
-  {id:5,ico:'🏋️',brand:'FitLife Brand',title:'Landing Page Design',cat:'web',tags:['Web Development','HTML','CSS'],pay:'₹4,500',days:'1 week',badge:'hot'},
-  {id:6,ico:'📸',brand:'PhotoCraft',title:'Instagram Carousel Posts (10)',cat:'design',tags:['Graphic Design','Instagram'],pay:'₹1,500',days:'3 days',badge:'new'},
-  {id:7,ico:'🎮',brand:'GameZone',title:'Twitter/X Content Calendar',cat:'writing',tags:['Content Writing','Social Media'],pay:'₹2,000',days:'5 days',badge:'apply'},
-  {id:8,ico:'🌿',brand:'GreenEarth NGO',title:'Website Redesign (WordPress)',cat:'web',tags:['Web Development','WordPress'],pay:'₹6,000',days:'2 weeks',badge:'hot'},
-  {id:9,ico:'💄',brand:'GlowUp Beauty',title:'TikTok Reel Editing (5 vids)',cat:'video',tags:['Video Editing','TikTok'],pay:'₹3,200',days:'4 days',badge:'new'},
-  {id:10,ico:'📚',brand:'StudyPro',title:'Email Newsletter Copy',cat:'writing',tags:['Content Writing','Copywriting'],pay:'₹1,600',days:'3 days',badge:'apply'},
-  {id:11,ico:'🚗',brand:'DriveNow',title:'Logo & Brand Identity Pack',cat:'design',tags:['Graphic Design','Logo','Branding'],pay:'₹3,800',days:'5 days',badge:'hot'},
-  {id:12,ico:'☕',brand:'BrewCo Café',title:'Product Photography Editing',cat:'design',tags:['Photography','Photo Editing'],pay:'₹1,200',days:'2 days',badge:'new'},
-];
+// JOBS DATA (Now fetches dynamically from Database)
+let ALL_JOBS = [];
 
+async function loadLiveJobs() {
+  try {
+    const res = await fetch('/api/jobs', { headers: { 'Authorization': 'Bearer ' + _tk } });
+    const data = await res.json();
+    if (data.success) {
+      ALL_JOBS = data.jobs;
+      runAiMatching(); // Update the AI match algorithm with real jobs
+      // If user is currently on the projects page, re-render them
+      if(document.getElementById('page-projects').classList.contains('active')){
+        renderProjects();
+      }
+    }
+  } catch (err) {
+    console.error("Failed to load live jobs:", err);
+  }
+}
 let curFilter='ai',curCat='all',curSearch='';
 let aiJobs=[],realApps=[],userSkills=[];
 
@@ -776,7 +789,7 @@ function loadUserData(userData){
   document.getElementById('wbGreet').textContent=`${greet}, ${fn}! 👋`;
 
   // ✅ Pre-fill ALL fields including bio and linkedin
-  const fields={pfn:fn,pln:u.lastName||parts.slice(1).join(' ')||'',pem:email,pcl:college,pbio:bio,plink:linkedin};
+  const fields={pfn:fn,pln:u.lastName||parts.slice(1).join(' ')||'',pem:email,pcl:college,pyear:u.year||'1st Year',pbio:bio,plink:linkedin,pportfolio:u.portfolioLink||''};
   Object.entries(fields).forEach(([id,val])=>{const el=document.getElementById(id);if(el)el.value=val||'';});
 
   const emojiMap={'Video Editing':'🎬','Graphic Design':'🎨','Web Development':'💻','Content Writing':'✍️','Social Media':'📱','Photography':'📸','Audio':'🎵','Data & Excel':'📊','AI Tools':'🤖'};
@@ -846,7 +859,7 @@ function renderProjects(){
   const bdg={hot:'<span class="tag th">🔥 Hot</span>',new:'<span class="tag tn">✨ New</span>',apply:'<span class="tag trev">📝 Apply</span>'};
   grid.innerHTML=jobs.map(j=>{
     const m=j.isMatch&&curFilter==='ai';const mt=j.matchedTags||[];
-    return`<div class="pc ${m?'matched':''}" onclick="applyJob(${j.id})">${m?'<div class="match-bd">🤖 Match</div>':''}<div class="pt_"><div class="pi">${j.ico}</div><div style="padding-right:${m?'70px':'0'}"><div class="pb_">${j.brand}</div><div class="pn">${j.title}</div></div></div><div class="ptgs">${(j.tags||[]).map(t=>`<span class="ptg ${mt.includes(t)?'mt':''}">${t}</span>`).join('')}</div><div class="pf_"><div><div class="pp">${j.pay}</div><div class="pm">⏱ ${j.days} · 📍 Remote</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">${bdg[j.badge]}<button class="pa" onclick="event.stopPropagation();applyJob(${j.id})">Apply</button></div></div></div>`;
+    return`<div class="pc ${m?'matched':''}" onclick="applyJob('${j.id}')">${m?'<div class="match-bd">🤖 Match</div>':''}<div class="pt_"><div class="pi">${j.ico}</div><div style="padding-right:${m?'70px':'0'}"><div class="pb_">${j.brand}</div><div class="pn">${j.title}</div></div></div><div class="ptgs">${(j.tags||[]).map(t=>`<span class="ptg ${mt.includes(t)?'mt':''}">${t}</span>`).join('')}</div><div class="pf_"><div><div class="pp">${j.pay}</div><div class="pm">⏱ ${j.days} · 📍 Remote</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">${bdg[j.badge]}<button class="pa" onclick="event.stopPropagation();applyJob('${j.id}')">Apply</button></div></div></div>`;
   }).join('');
 }
 
@@ -875,15 +888,18 @@ async function saveProfile(){
   const fn=document.getElementById('pfn').value.trim();
   const ln=document.getElementById('pln').value.trim();
   const college=document.getElementById('pcl').value.trim();
+  const year=document.getElementById('pyear').value; // ✅ Fixed Year
   const skills=[...document.querySelectorAll('.sk-opt.sel')].map(e=>e.dataset.skill);
   const bio=document.getElementById('pbio').value.trim();
   const linkedin=document.getElementById('plink').value.trim();
+  const portfolioLink=document.getElementById('pportfolio').value.trim(); // ✅ Added Portfolio
+
   if(!fn){showToast('Enter your first name','error');btn.innerHTML='💾 Save Changes';btn.disabled=false;return;}
   try{
     const res=await fetch('/api/profile',{
       method:'PUT',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+_tk},
-      body:JSON.stringify({firstName:fn,lastName:ln,college,skills,bio,linkedin})
+      body:JSON.stringify({firstName:fn,lastName:ln,college,year,skills,bio,linkedin,portfolioLink}) // ✅ Sent to backend
     });
     const data=await res.json();
     if(data.success){
@@ -951,19 +967,37 @@ function logout(){
     window.location.href='/login';
   }});
 }
-
 // INIT
 window.addEventListener('DOMContentLoaded',()=>{
   const d=new Date();
   document.getElementById('pgD').textContent=d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  loadUserData();         // Instant from localStorage
-  loadStats();            // Real data from MongoDB
-  fetchFreshProfile();    // ✅ Bio/LinkedIn fix
+  loadUserData();         
+  loadStats();            
+  fetchFreshProfile();    
+  
+  if (typeof loadLiveJobs === 'function') loadLiveJobs(); // Fetch real jobs
+
+  // ✅ CHECK FOR NEW USERS (Google Login or New Register)
+  if (_u && _u.role === 'student') {
+    if (!_u.college || !_u.skills || _u.skills.length === 0) {
+      document.getElementById('welcomeOverlay').classList.add('show');
+      document.getElementById('welcomePopup').style.display = 'block';
+    }
+  }
+
   gsap.timeline({defaults:{ease:'power3.out'}})
     .fromTo('.sidebar',{x:-20,opacity:0},{x:0,opacity:1,duration:.5})
     .fromTo('.topbar',{y:-10,opacity:0},{y:0,opacity:1,duration:.4},'-=.3')
     .fromTo('#page-home',{y:14,opacity:0},{y:0,opacity:1,duration:.4},'-=.2');
 });
+
+// ✅ Close Popup and redirect to Profile
+function closeWelcomePopup() {
+  document.getElementById('welcomeOverlay').classList.remove('show');
+  document.getElementById('welcomePopup').style.display = 'none';
+  goTo('profile', document.getElementById('bn-profile') || null);
+  showToast('Please fill out your details to continue!', 'info');
+}
 </script>
 </body>
 </html> 

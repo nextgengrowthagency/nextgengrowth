@@ -45,6 +45,7 @@ const userSchema = new mongoose.Schema({
   serviceNeeded:{type:String,default:""},
   bio:{type:String,default:""},
   linkedin:{type:String,default:""},
+  portfolioLink:{type:String,default:""}, // ✅ Added Portfolio
   googleId:{type:String,default:""},   // ✅ Google OAuth
   isVerified:{type:Boolean,default:false}, // ✅ Email verified
   avatar:{type:String,default:""},
@@ -482,15 +483,16 @@ app.get("/api/profile",verifyToken,async(req,res)=>{
 
 app.put("/api/profile",verifyToken,async(req,res)=>{
   try{
-    const{firstName,lastName,college,year,skills,bio,linkedin}=req.body;
+    const{firstName,lastName,college,year,skills,bio,linkedin,portfolioLink}=req.body;
     const updates={};
     if(firstName!==undefined)updates.firstName=firstName;
     if(lastName!==undefined)updates.lastName=lastName;
     if(college!==undefined)updates.college=college;
-    if(year!==undefined)updates.year=year;       // ✅ Year save
+    if(year!==undefined)updates.year=year;       
     if(skills!==undefined)updates.skills=skills;
     if(bio!==undefined)updates.bio=bio;
     if(linkedin!==undefined)updates.linkedin=linkedin;
+    if(portfolioLink!==undefined)updates.portfolioLink=portfolioLink; // ✅ Added Portfolio
     const updated=await User.findByIdAndUpdate(req.user.id,{$set:updates},{new:true,runValidators:false});
     res.json({success:true,message:"Profile updated!",user:safeUser(updated)});
   }catch(err){res.status(500).json({success:false,message:"Server error."});}

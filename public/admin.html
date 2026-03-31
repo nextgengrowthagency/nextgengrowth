@@ -988,8 +988,7 @@ function renderApps(){
       <td>${stMap[a.status]||a.status}</td>
       <td style="font-size:.76rem;color:var(--muted)">${new Date(a.createdAt||a.appliedAt).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</td>
       <td style="display:flex;gap:5px;flex-wrap:wrap">
-        ${a.status!=='accepted'?`<button class="btn bsm" style="background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.2);color:var(--gb)" onclick="updateApp('${a._id||a.id}','accepted')">✓ Accept</button>`:''}
-        ${a.status!=='rejected'?`<button class="btn bdan bsm" onclick="updateApp('${a._id||a.id}','rejected')">✗ Reject</button>`:''}
+        <span style="font-size:.75rem;color:var(--muted)">Managed by Brand</span>
       </td>
     </tr>`).join('');
 }
