@@ -557,14 +557,9 @@ function renderBrandApps(){
       ${s.linkedin?`<div style="font-size:.78rem;margin-bottom:12px"><a href="${s.linkedin}" target="_blank" style="color:#1d4ed8;font-weight:600">🔗 View LinkedIn Profile →</a></div>`:''}
       <div class="app-actions">
         ${a.status==='review'?`
-          <button class="btn bgre" onclick="handleApp('${a._id||a.id}','accepted',this)">✅ Accept — Student Gets Email!</button>
-          <button class="btn bdan" onclick="handleApp('${a._id||a.id}','rejected',this)">❌ Reject</button>
-          <td style="display:flex;gap:5px;flex-wrap:wrap">
-        <button class="btn bout bsm" onclick="viewStudentProfile('${a.student.id}')">👤 View Profile</button> 
-        
-        ${a.status!=='accepted'?`<button class="btn bpri bsm" onclick="updateApp('${a._id}','accepted')">✓ Accept</button>`:''}
-        ${a.status!=='rejected'?`<button class="btn bdan bsm" onclick="updateApp('${a._id}','rejected')">✗ Reject</button>`:''}
-      </td>
+          <button class="btn bout bsm" onclick="viewStudentProfile('${a._id||a.id}')">👤 View Profile</button> 
+          <button class="btn bgre bsm" onclick="handleApp('${a._id||a.id}','accepted',this)">✅ Accept</button>
+          <button class="btn bdan bsm" onclick="handleApp('${a._id||a.id}','rejected',this)">❌ Reject</button>
         `:a.status==='accepted'?`<span style="color:var(--gm);font-weight:600;font-size:.83rem">✅ You accepted this application</span>`:
         `<span style="color:#dc2626;font-weight:600;font-size:.83rem">❌ You rejected this application</span>`}
         <span class="app-date">Applied ${new Date(a.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</span>
@@ -675,10 +670,11 @@ window.addEventListener('DOMContentLoaded',()=>{
     .fromTo('#page-home',{y:14,opacity:0},{y:0,opacity:1,duration:.4},'-=.2');
 });
 // ✅ OPEN STUDENT PROFILE MODAL
-function viewStudentProfile(studentId) {
-  // Find the application with this student
-  const app = allApps.find(a => a.student.id === studentId);
-  if (!app) return;
+function viewStudentProfile(appId) {
+  // Find the exact application in the brandApps array
+  const app = brandApps.find(a => (a._id === appId || a.id === appId));
+  if (!app || !app.student) return;
+  
   const s = app.student;
 
   // Populate Name & College
