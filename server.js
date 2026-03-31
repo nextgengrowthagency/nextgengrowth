@@ -618,7 +618,7 @@ app.get("/api/brand/applications",verifyToken,async(req,res)=>{
     const jobIds=brandJobs.map(j=>j._id.toString());
     const jobTitles=brandJobs.map(j=>j.title);
     const apps=await Application.find({$or:[{brandId:req.user.id},{jobId:{$in:jobIds}},{brandName:brandName}]})
-      .populate("studentId","firstName lastName email college year skills bio linkedin")
+      .populate("studentId","firstName lastName email college year skills bio linkedin portfolioLink avatar") // ✅ Added fields
       .sort({createdAt:-1});
     const result=apps.map(a=>({
       ...a.toObject(),
@@ -631,6 +631,8 @@ app.get("/api/brand/applications",verifyToken,async(req,res)=>{
         skills:a.studentId?.skills||[],
         bio:a.studentId?.bio||"",
         linkedin:a.studentId?.linkedin||"",
+        portfolioLink:a.studentId?.portfolioLink||"", // ✅ Added field
+        avatar:a.studentId?.avatar||"",               // ✅ Added field
       }
     }));
     res.json({success:true,applications:result});

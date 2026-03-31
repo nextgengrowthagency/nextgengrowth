@@ -408,7 +408,33 @@
   </div>
 </div>
 </div>
+<div class="overlay" id="studentProfileOverlay" onclick="closeStudentProfile()"></div>
+<div class="card" id="studentProfileModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); z-index:10000; width:90%; max-width:500px; max-height:85vh; overflow-y:auto; box-shadow:0 20px 40px rgba(0,0,0,0.3);">
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px;">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div id="spAvatar" style="width:50px; height:50px; border-radius:50%; background:linear-gradient(135deg, var(--gm), var(--gd)); color:white; display:flex; align-items:center; justify-content:center; font-family:'Clash Display', sans-serif; font-size:1.2rem; font-weight:700;">?</div>
+      <div>
+        <h3 id="spName" style="font-family:'Clash Display', sans-serif; font-size:1.2rem; color:var(--td); margin-bottom:2px;">Student Name</h3>
+        <p id="spCollege" style="font-size:.8rem; color:var(--ts);">College & Year</p>
+      </div>
+    </div>
+    <button onclick="closeStudentProfile()" style="background:none; border:none; font-size:1.2rem; cursor:pointer; color:var(--ts);">✕</button>
+  </div>
+  
+  <div style="background:var(--off); border:1px solid var(--br); border-radius:9px; padding:12px; margin-bottom:16px;">
+    <strong style="display:block; font-size:.8rem; color:var(--td); margin-bottom:6px;">About Me</strong>
+    <p id="spBio" style="font-size:.85rem; color:var(--ts); line-height:1.5;">No bio provided.</p>
+  </div>
 
+  <strong style="display:block; font-size:.8rem; color:var(--td); margin-bottom:8px;">Skills</strong>
+  <div id="spSkills" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px;">
+    </div>
+
+  <div style="display:flex; gap:10px; margin-top:20px;">
+    <a id="spPortfolio" href="#" target="_blank" class="btn bpri" style="flex:1; justify-content:center; display:none;">📂 View Portfolio</a>
+    <a id="spLinkedin" href="#" target="_blank" class="btn bout" style="flex:1; justify-content:center; display:none;">🔗 LinkedIn</a>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -533,6 +559,12 @@ function renderBrandApps(){
         ${a.status==='review'?`
           <button class="btn bgre" onclick="handleApp('${a._id||a.id}','accepted',this)">✅ Accept — Student Gets Email!</button>
           <button class="btn bdan" onclick="handleApp('${a._id||a.id}','rejected',this)">❌ Reject</button>
+          <td style="display:flex;gap:5px;flex-wrap:wrap">
+        <button class="btn bout bsm" onclick="viewStudentProfile('${a.student.id}')">👤 View Profile</button> 
+        
+        ${a.status!=='accepted'?`<button class="btn bpri bsm" onclick="updateApp('${a._id}','accepted')">✓ Accept</button>`:''}
+        ${a.status!=='rejected'?`<button class="btn bdan bsm" onclick="updateApp('${a._id}','rejected')">✗ Reject</button>`:''}
+      </td>
         `:a.status==='accepted'?`<span style="color:var(--gm);font-weight:600;font-size:.83rem">✅ You accepted this application</span>`:
         `<span style="color:#dc2626;font-weight:600;font-size:.83rem">❌ You rejected this application</span>`}
         <span class="app-date">Applied ${new Date(a.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</span>
@@ -642,6 +674,60 @@ window.addEventListener('DOMContentLoaded',()=>{
     .fromTo('.topbar',{y:-10,opacity:0},{y:0,opacity:1,duration:.4},'-=.3')
     .fromTo('#page-home',{y:14,opacity:0},{y:0,opacity:1,duration:.4},'-=.2');
 });
+// ✅ OPEN STUDENT PROFILE MODAL
+function viewStudentProfile(studentId) {
+  // Find the application with this student
+  const app = allApps.find(a => a.student.id === studentId);
+  if (!app) return;
+  const s = app.student;
+
+  // Populate Name & College
+  document.getElementById('spName').textContent = s.name;
+  document.getElementById('spCollege').textContent = `${s.college || 'College not listed'} ${s.year ? '• ' + s.year : ''}`;
+  
+  // Populate Avatar (Initials)
+  const parts = s.name.split(' ');
+  const initials = parts.length >= 2 ? (parts[0][0] + parts[parts.length-1][0]).toUpperCase() : s.name.slice(0,2).toUpperCase();
+  document.getElementById('spAvatar').textContent = initials;
+
+  // Populate Bio
+  document.getElementById('spBio').textContent = s.bio || "This student hasn't written a bio yet.";
+
+  // Populate Skills
+  const skillsContainer = document.getElementById('spSkills');
+  if (s.skills && s.skills.length > 0) {
+    skillsContainer.innerHTML = s.skills.map(sk => `<span class="tag tn">${sk}</span>`).join('');
+  } else {
+    skillsContainer.innerHTML = `<span style="font-size:.8rem; color:var(--ts);">No skills listed.</span>`;
+  }
+
+  // Populate Links
+  const btnPortfolio = document.getElementById('spPortfolio');
+  if (s.portfolioLink) {
+    btnPortfolio.href = s.portfolioLink;
+    btnPortfolio.style.display = 'flex';
+  } else {
+    btnPortfolio.style.display = 'none';
+  }
+
+  const btnLinkedin = document.getElementById('spLinkedin');
+  if (s.linkedin) {
+    btnLinkedin.href = s.linkedin;
+    btnLinkedin.style.display = 'flex';
+  } else {
+    btnLinkedin.style.display = 'none';
+  }
+
+  // Show Modal
+  document.getElementById('studentProfileOverlay').classList.add('show');
+  document.getElementById('studentProfileModal').style.display = 'block';
+}
+
+// ✅ CLOSE MODAL
+function closeStudentProfile() {
+  document.getElementById('studentProfileOverlay').classList.remove('show');
+  document.getElementById('studentProfileModal').style.display = 'none';
+}
 </script>
 </body>
 </html>
